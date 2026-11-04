@@ -1,69 +1,123 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import { Button } from '@/components/Button';
+import { ContactForm } from '@/components/ContactForm';
+import { Orbit } from '@/components/Orbit';
+import { Route } from '@/components/Route';
+import { ServiceTabs } from '@/components/ServiceTabs';
+import { about, contactHref, engagement, faq, finalCta, hero, howItWorks, principles, servicesIntro, site } from '@/data/site';
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faq.items.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
 
 export default function Home() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>
-            To get started, edit the{" "}
-            <code className={styles.code}>page.tsx</code> file.
-          </h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <>
+      <section className="hero" aria-labelledby="hero-title">
+        <div className="hero__copy">
+          <p className="label" data-reveal="fade" data-intro>{hero.eyebrow}</p>
+          <h1 id="hero-title" className="hero__title" data-split="lines" data-intro>{hero.headline}</h1>
+          <p className="hero__lede">{hero.copy}</p>
+          <div className="hero__actions" data-reveal="up" data-intro data-delay="0.35">
+            <Button href={contactHref} arrow>{site.cta.primary}</Button>
+            <Button href="#services" variant="line">{site.cta.secondary}</Button>
+          </div>
         </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <div className="hero__visual" data-reveal="fade" data-intro data-delay="0.15">
+          <Orbit />
         </div>
-      </main>
-    </div>
+      </section>
+
+      <section id="services" className="section section--services" aria-labelledby="services-title">
+        <div className="section__head">
+          <h2 id="services-title" className="h2" data-split="lines">{servicesIntro.heading}</h2>
+          <p className="section__intro" data-reveal="up">{servicesIntro.copy}</p>
+        </div>
+        <ServiceTabs />
+        <div className="svc__cta" data-reveal="up">
+          <p>Not sure which service fits? Tell us what you&rsquo;re working on.</p>
+          <Button href={contactHref} arrow>{site.cta.primary}</Button>
+        </div>
+      </section>
+
+      <section id="how-it-works" className="section section--how" aria-labelledby="how-title">
+        <div className="section__head">
+          <h2 id="how-title" className="h2" data-split="lines">{howItWorks.heading}</h2>
+        </div>
+        <Route />
+      </section>
+
+      <section id="about" className="section section--dark" aria-labelledby="about-title">
+        <div className="about">
+          <p className="label about__label">{about.label}</p>
+          <h2 id="about-title" className="h2" data-split="lines">{about.heading}</h2>
+          <p className="about__text" data-reveal="up">{about.text}</p>
+        </div>
+        <div className="why">
+          <div className="why__head">
+            <h3 className="h3">{principles.heading}</h3>
+          </div>
+          <ol className="why__list">
+            {principles.items.map((p, i) => (
+              <li key={p.name} data-reveal="up" data-delay={String(i * 0.06)}>
+                <span className="why__n" aria-hidden="true">0{i + 1}</span>
+                <h4 className="why__name">{p.name}</h4>
+                <p className="why__text">{p.text}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      <section id="engagement" className="section section--engage" aria-labelledby="engage-title">
+        <div className="engage">
+          <div className="engage__head">
+            <h2 id="engage-title" className="h2" data-split="lines">{engagement.heading}</h2>
+            <p className="section__intro">{engagement.intro}</p>
+          </div>
+          <ol className="engage__list">
+            {engagement.stages.map((s, i) => (
+              <li key={s.name} className="engage__stage" data-reveal="up">
+                <span className="engage__n" aria-hidden="true">0{i + 1}</span>
+                <div>
+                  <h3 className="engage__name">{s.name}</h3>
+                  <p className="engage__text">{s.text}</p>
+                </div>
+                <p className="engage__out"><span className="label">you get</span>{s.output}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      <section id="faq" className="section section--faq" aria-labelledby="faq-title">
+        <div className="faq">
+          <h2 id="faq-title" className="h2" data-split="lines">{faq.heading}</h2>
+          <div className="faq__list">
+            {faq.items.map((f) => (
+              <details key={f.q} className="faq__item">
+                <summary>
+                  <span>{f.q}</span>
+                  <span className="faq__icon" aria-hidden="true" />
+                </summary>
+                <p>{f.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd).replace(/</g, '\\u003c') }} />
+      </section>
+
+      <section id="contact" className="cta" aria-labelledby="cta-title">
+        <div className="cta__intro">
+          <h2 id="cta-title" className="cta__title" data-split="lines">{finalCta.heading}</h2>
+          <p className="cta__copy">{finalCta.copy}</p>
+        </div>
+        <div className="cta__side">
+          <ContactForm />
+        </div>
+      </section>
+    </>
   );
 }
