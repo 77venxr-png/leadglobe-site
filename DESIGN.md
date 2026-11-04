@@ -137,39 +137,54 @@ Mechanics (`src/components/Orbit.tsx`, one gsap.ticker driver):
 - Phones (orbit container ≤ 520px): short names on the nodes, statuses hidden, one ink caption line under the orbit narrates the current handoff.
 - Outcomes describe the work's intended contribution, not results. Activity lines are sample data.
 
-## Hero v3: the revenue engine (2026-11-04)
+## Hero v3: the leaking sales pipeline (2026-11-04)
 
-Owner brief: a miniature 3D GTM ecosystem that tells one story in a 12 s loop: siloed stations,
-leaking pipeline, leadglobe connects them, connected execution, revenue. The orbit stays on the
-service pages; the home hero gets the engine.
+Owner brief: a 3D hero that tells leakage, then connection, then revenue in one loop. First
+version was a ring of stations around an engine; the owner's verdict was "the visual doesn't
+deliver sales intuition". Rebuilt as a straight sales pipeline: anyone who has seen a funnel
+report should read it in three seconds as "prospects leaking out of my pipeline, then fixed".
+The orbit stays on the service pages; the home hero gets the pipeline.
 
 ```
-Idea:        Opportunities leak between disconnected GTM teams; leadglobe connects them into one engine.
-Metaphor:    a porcelain architectural model on a plinth: stations, channels, a central mechanism.
-Signature:   the gaps close. Charcoal rails grow out of the assembling engine into every station,
-             the broken white channels are bridged, and the same black spheres that fell
-             through the gaps now flow through every station into the revenue bowl.
-Emotion:     calm precision, then relief: "nothing gets lost any more".
-Motion verb: route (unchanged). Spheres travel lines, parts drop in and lock, rails draw.
-Screenshot:  the assembled model, bowl filling, "one connected gtm engine." above the hub.
+Idea:        Prospects leak out between disconnected GTM teams; strategy plus connected
+             execution closes every gap, and the stage counts prove it.
+Metaphor:    a porcelain architectural model on a plinth: market tray, a rail track through
+             real sales stages, a closed-won tray.
+Signature:   the gaps close. GTM strategy scans the market and marks the right accounts, a
+             charcoal spine draws along the back, each service module docks at a handoff and
+             bridges its gap, and the marked accounts ride all the way into closed won while
+             the counters climb past the "was" numbers.
+Emotion:     recognition ("that's my pipeline"), then relief.
+Motion verb: route (unchanged). Spheres travel the rails, parts drop in and lock, the spine draws.
+Screenshot:  the fixed pipeline, counts "16 / 15 / 13 / 12 / 10 / 9" beside "was 16 / 10 / 6 /
+             3 / 1 / 0", nine accounts in the pink closed-won tray.
 ```
 
-Scene plan (world units, plinth radius 4.9, channel height 0.34):
-- Six stations on a ring (r 3.0, every 60°): paid media 0°, revops 60°, abm 120°, content 180°,
-  gtm strategy 240°, outbound 300°. Back gap (270°): the prospect hopper. Front gap (90°): the
-  revenue bowl, nearest the camera.
-- Fragmented (white channels): ring arcs with gaps at 30°, 150°, 210° and a broken spur to the
-  bowl. Pink drain rings mark the gaps. Station mechanisms spin at their own speeds.
-- Connected (charcoal = leadglobe): engine drops in part by part, 8 radial rails draw out from it,
-  gaps are bridged in charcoal, drains close, station mechanisms lock to the engine's rhythm.
-- Loop (12 s): 0 siloed, 1.2–4.6 leakage, 4.6–6.2 connect, 6.0–10.2 flow, 9.8–11.2 revenue label,
-  11.2–12 reset (reverse assembly) back to frame 0.
+Scene (model space, turned -0.74 rad so the track runs diagonally towards the camera):
+- Left: the market tray (5 x 7 accounts). Right: the closed-won tray with a pink rim.
+- Track: white twin rails through accounts, contacted, replied, meeting, opportunity, closed won.
+  Broken at each of the five handoffs; a pink drain under each gap catches what falls.
+- Behind each handoff: one service module (outbound, paid media, content, abm, revops) with a
+  docking arm. Behind everything: the charcoal spine (leadglobe) from the strategy frame.
+- Labels: stage counts hang on the plinth in front of the track; service tags float above the
+  modules; "one connected gtm engine." sits in the empty corner (bottom left; top right on
+  narrow containers) so it never covers the model.
 
-Implementation: plain three (lazy `import()` after first paint, only when the hero is visible),
+Loop (13 s), a pure function of time (`story(t)`):
+- 0 to 4.9 run 0, leaking: 16 random accounts go down the broken track, 0 close.
+- 4.9 to 6.6 fixing: strategy frame drops and scans (16 accounts get pink rings), spine draws,
+  modules dock, bridges slide in, drains close.
+- 6.3 to 11 run 1, connected: the 16 marked accounts flow, 9 reach closed won; "was N" appears.
+- 11 to 12.3 revenue label, 12.3 to 13 reset and the market refills.
+
+Implementation: plain three (lazy `import()` after first paint, only while the hero is visible),
 driven by gsap.ticker. No R3F: it brings its own render loop and would break the one-clock rule.
-Modules in `src/components/gtm/scene/`: layout (geometry constants, routes), GTMAnimationController
-(pure time → state), GTMStations, RevenuePipeline, GTMEngine, CustomerSpheres, GTMScene (renderer,
-camera, lights, per-frame apply). `GTMHero.tsx` owns the DOM: poster image, canvas, projected
-labels, stage strip, pause button.
-Fallbacks: reduced motion renders one still 3D frame of the finished state; no WebGL, Save-Data
-or low-memory devices keep the poster image (a capture of that same frame).
+Modules in `src/components/gtm/scene/`: layout (constants, sphere fates, routes),
+GTMAnimationController (time to state), GTMStations (gates, service modules), RevenuePipeline
+(rails, bridges, drains, trays), GTMEngine (spine, hub, strategy scanner), CustomerSpheres
+(accounts, rings, live counts), GTMScene (renderer, camera, lights, frame, label projection).
+`GTMHero.tsx` owns the DOM: poster, canvas, projected labels with live counts, stage strip, pause.
+Phones and touch: 30 fps cap, DPR 1.25, shadow map updated every third frame.
+Fallbacks: reduced motion renders one still 3D frame at t 11.6 (the fixed pipeline); no WebGL,
+Save-Data or low-memory devices get `public/hero/gtm-engine.png`, a capture of the same frame
+(`?gtm-still=11.6`). Regenerate it whenever the scene changes.

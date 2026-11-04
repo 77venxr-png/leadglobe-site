@@ -1,25 +1,29 @@
-// The revenue engine scene: renderer, camera, soft studio light, plinth, and the four modules.
+// The sales-pipeline scene: renderer, camera, soft studio light, plinth, and the four modules.
 // Loaded lazily by GTMHero. It never runs its own loop: the caller drives frame() from gsap.ticker.
 import * as THREE from 'three';
 import { createSpheres } from './CustomerSpheres';
 import { createEngine } from './GTMEngine';
 import { createStations } from './GTMStations';
-import { createPipeline } from './RevenuePipeline';
+import { createPipeline, slab } from './RevenuePipeline';
 import { story, type StoryState } from './GTMAnimationController';
-import { BOWL, HOPPER, PLINTH_H, PLINTH_R, R, at, stations, type StationId, type Vec } from './layout';
-import { createMaterials, puckGeometry } from './materials';
+import {
+  MARKET, MODULE_Z, PLINTH, TRAY, YAW, handoffs, stages, type Vec,
+} from './layout';
+import { createMaterials } from './materials';
 
 export type SceneInput = { pointerX: number; pointerY: number; scroll: number; time: number };
 export type GTMSceneHandle = ReturnType<typeof createGTMScene>;
 
-/** Top of each station's structure, so its tag sits right on it. */
-const TOPS: Record<StationId, number> = { paid: 1.08, revops: 0.9, abm: 1.06, content: 0.5, strategy: 1.02, outbound: 0.86 };
-/** Anchors the DOM labels follow: six stations, prospects, revenue, then the final label (same spot as revenue). */
+/** Label anchors in model space: 6 stages, 5 services, strategy, market, final label.
+ *  Stage counts sit on the plinth in front of the track (tags hang below the anchor);
+ *  service tags float above the modules behind it, so the two rows never collide. */
 export const anchors: Vec[] = [
-  ...stations.map((s) => at(s.deg, R, TOPS[s.id] + 0.08)),
-  [HOPPER[0], 1.0, HOPPER[2]],
-  [BOWL[0], -0.42, BOWL[2] + 0.75],
-  [BOWL[0], -0.42, BOWL[2] + 0.75],
+  ...stages.slice(0, -1).map((s) => [s.x, 0.02, 0.62] as Vec),
+  [TRAY[0], 0.02, TRAY[2] + 0.72],
+  ...handoffs.map((h) => [h.x, 1.0, MODULE_Z - 0.05] as Vec),
+  [MARKET.x, 0.7, MARKET.z - 1.45],
+  [MARKET.x - 0.2, 0.02, MARKET.z + 1.4],
+  [TRAY[0] - 0.9, 1.15, PLINTH.z0 + 0.3],
 ];
 
 export function createGTMScene(canvas: HTMLCanvasElement, opts: { lowPower: boolean }) {
@@ -40,88 +44,101 @@ export function createGTMScene(canvas: HTMLCanvasElement, opts: { lowPower: bool
   let frames = 0;
 
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(24, 1, 1, 80);
+  const camera = new THREE.PerspectiveCamera(22, 1, 1, 120);
   const mat = createMaterials();
 
-  // Light: a big soft key from the upper right-front, a sky/ground fill, a faint rim from the left.
   scene.add(new THREE.HemisphereLight(0xffffff, 0xf3eeec, 1.7));
   const key = new THREE.DirectionalLight(0xffffff, 2.1);
-  key.position.set(5.5, 11, 6.5);
+  key.position.set(4, 12, 7);
   key.castShadow = true;
   key.shadow.mapSize.setScalar(opts.lowPower ? 1024 : 2048);
   const sc = key.shadow.camera as THREE.OrthographicCamera;
-  sc.left = sc.bottom = -6.2;
-  sc.right = sc.top = 6.2;
+  sc.left = sc.bottom = -8.5;
+  sc.right = sc.top = 8.5;
   sc.near = 2;
-  sc.far = 30;
+  sc.far = 34;
   key.shadow.bias = -0.0004;
   key.shadow.normalBias = 0.02;
-  key.shadow.radius = 5;
   scene.add(key);
   const rim = new THREE.DirectionalLight(0xfff4f6, 0.45);
-  rim.position.set(-7, 4, -3);
+  rim.position.set(-8, 4, -4);
   scene.add(rim);
 
-  // Plinth: a porcelain disc the model stands on, casting a soft shadow onto the page.
-  const plinth = new THREE.Mesh(puckGeometry(PLINTH_R, PLINTH_H, 0.08, 96), mat.plinth);
-  plinth.position.y = -PLINTH_H;
+  // Model root: everything in pipeline space, turned so the won end comes towards the camera.
+  const root = new THREE.Group();
+  root.rotation.y = YAW;
+  scene.add(root);
+
+  const plinth = new THREE.Mesh(slab(PLINTH.x1 - PLINTH.x0, PLINTH.z1 - PLINTH.z0, PLINTH.h, PLINTH.r, 0.06), mat.plinth);
+  plinth.position.set((PLINTH.x0 + PLINTH.x1) / 2, -PLINTH.h, (PLINTH.z0 + PLINTH.z1) / 2);
   plinth.receiveShadow = true;
-  scene.add(plinth);
-  const ground = new THREE.Mesh(new THREE.PlaneGeometry(30, 30).rotateX(-Math.PI / 2), new THREE.ShadowMaterial({ opacity: 0.08 }));
-  ground.position.y = -PLINTH_H - 0.001;
+  root.add(plinth);
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(40, 40).rotateX(-Math.PI / 2), new THREE.ShadowMaterial({ opacity: 0.08 }));
+  ground.position.y = -PLINTH.h - 0.001;
   ground.receiveShadow = true;
   scene.add(ground);
-  // The space the engine will occupy: a faint etched ring in the plinth.
-  const etch = new THREE.Mesh(new THREE.RingGeometry(1.24, 1.27, 96).rotateX(-Math.PI / 2), mat.etch);
-  etch.position.y = 0.002;
-  scene.add(etch);
 
-  // Fake ambient occlusion: soft contact blobs under stations, hopper and bowl.
-  const aoSpots: [number, number, number][] = [
-    ...stations.map((s) => { const p = at(s.deg, R, 0); return [p[0], p[2], 1.75] as [number, number, number]; }),
-    [HOPPER[0], HOPPER[2], 1.5], [BOWL[0], BOWL[2], 1.7],
-  ];
+  // Fake ambient occlusion: soft contact blobs under the trays and the module bays.
+  // (Only under things that are always there; modules and hub bring their own shadows.)
+  const aoSpots: [number, number, number][] = [[MARKET.x, MARKET.z, 3.0], [TRAY[0], TRAY[2], 1.7]];
   const ao = new THREE.InstancedMesh(new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2), mat.ao, aoSpots.length);
   const m4 = new THREE.Matrix4();
   aoSpots.forEach(([x, z, s], i) => ao.setMatrixAt(i, m4.makeScale(s, 1, s).setPosition(x, 0.003, z)));
   ao.renderOrder = -1;
-  scene.add(ao);
+  root.add(ao);
 
   const stationsM = createStations(mat);
   const pipeline = createPipeline(mat);
   const engine = createEngine(mat);
-  const spheres = createSpheres(mat);
-  scene.add(stationsM.group, pipeline.group, engine.group, spheres.mesh);
+  const spheres = createSpheres(mat, engine.scanZ);
+  root.add(stationsM.group, pipeline.group, engine.group, spheres.mesh, spheres.rings);
+  root.updateMatrixWorld(true);
 
-  // Camera rig: a slow orbit around a fixed target, nudged by pointer and scroll.
-  const target = new THREE.Vector3(0, 0.15, 0.25);
-  const cam = { az: Number.NaN, el: Number.NaN }; // NaN: snap to the target pose on the first frame
-  let aspect = 1;
-  let fitDist = 20;
-  const halfW = PLINTH_R + 0.42; // what must fit horizontally (plinth plus labels)
-  const halfH = 3.4;
+  // Camera rig: frames the whole plinth (and its labels) for any aspect ratio.
+  const box = new THREE.Box3(new THREE.Vector3(PLINTH.x0, -PLINTH.h, PLINTH.z0 - 0.2), new THREE.Vector3(PLINTH.x1, 1.35, PLINTH.z1 + 0.35));
+  const corners = Array.from({ length: 8 }, (_, i) => new THREE.Vector3(
+    i & 1 ? box.max.x : box.min.x, i & 2 ? box.max.y : box.min.y, i & 4 ? box.max.z : box.min.z,
+  ).applyMatrix4(root.matrixWorld));
+  const target = new THREE.Vector3(0.3, 0.1, -0.7).applyMatrix4(root.matrixWorld);
+  const cam = { az: Number.NaN, el: Number.NaN };
+  const BASE_EL = 50;
+  let fitDist = 30;
+  const v = new THREE.Vector3();
 
+  function pose(az: number, el: number, d: number) {
+    camera.position.set(
+      target.x + d * Math.cos(el) * Math.sin(az),
+      target.y + d * Math.sin(el),
+      target.z + d * Math.cos(el) * Math.cos(az),
+    );
+    camera.lookAt(target);
+    camera.updateMatrixWorld();
+  }
   function fit() {
-    const t = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
-    fitDist = Math.max(halfH / t, halfW / (t * aspect));
+    const az = THREE.MathUtils.degToRad(-2), el = THREE.MathUtils.degToRad(BASE_EL);
+    let d = 30;
+    for (let i = 0; i < 6; i++) {
+      pose(az, el, d);
+      let m = 0;
+      for (const c of corners) {
+        v.copy(c).project(camera);
+        m = Math.max(m, Math.abs(v.x) / 0.9, Math.abs(v.y) / 0.9);
+      }
+      d *= m;
+    }
+    fitDist = d;
   }
 
   function placeCamera(st: StoryState, input: SceneInput) {
     const idle = Math.sin((input.time / 26) * Math.PI * 2);
-    const az = THREE.MathUtils.degToRad(-4 + idle * 2.5 + input.pointerX * 5);
-    const el = THREE.MathUtils.degToRad(34 + input.scroll * 9 - input.pointerY * 3);
+    const az = THREE.MathUtils.degToRad(-2 + idle * 1.6 + input.pointerX * 3);
+    const el = THREE.MathUtils.degToRad(BASE_EL + input.scroll * 7 - input.pointerY * 2.5);
+    if (Number.isNaN(cam.az)) { cam.az = az; cam.el = el; }
     cam.az += (az - cam.az) * 0.06;
     cam.el += (el - cam.el) * 0.06;
-    const d = fitDist * (1 - 0.02 * st.dolly);
-    camera.position.set(
-      target.x + d * Math.cos(cam.el) * Math.sin(cam.az),
-      target.y + d * Math.sin(cam.el),
-      target.z + d * Math.cos(cam.el) * Math.cos(cam.az),
-    );
-    camera.lookAt(target);
+    pose(cam.az, cam.el, fitDist * (1 + 0.04 * (1 - Math.cos(cam.az)) - 0.015 * st.dolly));
   }
 
-  const v = new THREE.Vector3();
   let width = 1, height = 1;
 
   return {
@@ -129,32 +146,27 @@ export function createGTMScene(canvas: HTMLCanvasElement, opts: { lowPower: bool
       width = w; height = h;
       renderer.setPixelRatio(dpr);
       renderer.setSize(w, h, false);
-      aspect = w / h;
-      camera.aspect = aspect;
+      camera.aspect = w / h;
       camera.updateProjectionMatrix();
       fit();
     },
-    /** Render the story at loop time t. dt drives the integrated spins. Returns the story state. */
+    /** Render the story at loop time t. dt drives the integrated spins. */
     frame(t: number, dt: number, input: SceneInput, snap = false) {
       const st = story(t);
-      spheres.update(st.t);
-      const speed = engine.update(st.engine, st.spin, dt);
-      stationsM.update(dt, speed, st.sync, spheres.activity);
+      spheres.update(st.t, st.scan);
+      const speed = engine.update(st, dt);
+      stationsM.update(st, dt, speed, spheres.activity);
       pipeline.update(st, spheres.pulses);
-      if (snap) { cam.az = Number.NaN; } // first frame: jump straight to the target pose
-      if (Number.isNaN(cam.az)) {
-        cam.az = THREE.MathUtils.degToRad(-4 + input.pointerX * 5);
-        cam.el = THREE.MathUtils.degToRad(34 + input.scroll * 9);
-      }
+      if (snap) cam.az = Number.NaN;
       placeCamera(st, input);
       if (opts.lowPower) renderer.shadowMap.needsUpdate = snap || frames++ % 3 === 0;
       renderer.render(scene, camera);
-      return { state: st, activity: spheres.activity };
+      return { state: st, counts: spheres.counts, activity: spheres.activity };
     },
     /** Screen positions (CSS px, relative to the canvas) of every label anchor. */
     project(out: Float32Array) {
       anchors.forEach((a, i) => {
-        v.set(a[0], a[1], a[2]).project(camera);
+        v.set(a[0], a[1], a[2]).applyMatrix4(root.matrixWorld).project(camera);
         out[i * 2] = (v.x * 0.5 + 0.5) * width;
         out[i * 2 + 1] = (-v.y * 0.5 + 0.5) * height;
       });
@@ -165,7 +177,7 @@ export function createGTMScene(canvas: HTMLCanvasElement, opts: { lowPower: bool
       engine.dispose();
       spheres.dispose();
       scene.traverse((o) => { if ((o as THREE.Mesh).geometry) (o as THREE.Mesh).geometry.dispose(); });
-      Object.values(mat).forEach((m) => { (m as THREE.Material).dispose(); const map = (m as THREE.MeshBasicMaterial).map; map?.dispose(); });
+      Object.values(mat).forEach((m) => { (m as THREE.Material).dispose(); (m as THREE.MeshBasicMaterial).map?.dispose(); });
       renderer.dispose();
     },
   };

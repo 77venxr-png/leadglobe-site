@@ -1,160 +1,140 @@
-// Six miniature stations around the ring. Static parts are merged into three meshes (porcelain,
-// charcoal, glass-free); each station keeps one moving mechanism that runs at its own speed while
-// siloed and locks to the engine's rhythm once connected.
+// Stage gates the track passes through (accounts → opportunity), and the five service modules that
+// dock behind the handoffs once leadglobe connects the pipeline. Each module keeps one moving
+// mechanism: idle while docking, then locked to the engine's rhythm.
 import * as THREE from 'three';
-import { CH_Y, PAD_R, R, at, rad, stations, type StationId } from './layout';
+import { CH_Y, MODULE_Z, handoffs, services, stages, type ServiceId } from './layout';
 import { gearGeometry, merge, place, puckGeometry, type Materials } from './materials';
 
-type Part = { g: THREE.BufferGeometry; m: THREE.Matrix4 };
 type Spinner = { obj: THREE.Object3D; axis: 'x' | 'y' | 'z'; own: number; ratio: number };
-
 const box = (w: number, h: number, d: number) => new THREE.BoxGeometry(w, h, d);
 const cyl = (r: number, h: number, seg = 20) => new THREE.CylinderGeometry(r, r, h, seg);
+const DROP = 1.6;
 
 export function createStations(mat: Materials) {
   const group = new THREE.Group();
-  const porcelain: Part[] = [];
-  const charcoal: Part[] = [];
-  const spinners: Spinner[] = [];
+  const mesh = (g: THREE.BufferGeometry, m: THREE.Material) => {
+    const o = new THREE.Mesh(g, m);
+    o.castShadow = true;
+    o.receiveShadow = true;
+    return o;
+  };
 
-  stations.forEach((s) => {
-    const [x, , z] = at(s.deg, R, 0);
-    const th = rad(s.deg);
-    const face = Math.atan2(-Math.cos(th), -Math.sin(th)); // local +z points at the engine
-    const base = place(x, 0, z, face);
-    const P = (g: THREE.BufferGeometry, m: THREE.Matrix4) => porcelain.push({ g, m: base.clone().multiply(m) });
-    const C = (g: THREE.BufferGeometry, m: THREE.Matrix4) => charcoal.push({ g, m: base.clone().multiply(m) });
-    /** A moving part, placed in station space. */
-    const spin = (obj: THREE.Object3D, axis: Spinner['axis'], own: number, ratio: number, lx: number, ly: number, lz: number) => {
-      const holder = new THREE.Group();
-      holder.position.set(x, 0, z);
-      holder.rotation.y = face;
-      obj.position.set(lx, ly, lz);
-      holder.add(obj);
-      group.add(holder);
+  // ---- gates: porcelain arches over the track, one per stage before closed won
+  const gateParts: { g: THREE.BufferGeometry; m: THREE.Matrix4 }[] = [];
+  stages.slice(0, -1).forEach((s) => {
+    for (const z of [-0.34, 0.34]) {
+      gateParts.push({ g: puckGeometry(0.11, 0.05, 0.015, 20), m: place(s.x, 0, z) });
+      gateParts.push({ g: box(0.09, 0.86, 0.09), m: place(s.x, 0.48, z) });
+    }
+    gateParts.push({ g: box(0.13, 0.1, 0.82), m: place(s.x, 0.95, 0) });
+  });
+  group.add(mesh(merge(gateParts), mat.porcelain));
+  // a charcoal index plate on each beam
+  const plates = stages.slice(0, -1).map((s) => ({ g: box(0.135, 0.03, 0.5), m: place(s.x, 1.01, 0) }));
+  group.add(mesh(merge(plates), mat.charcoal));
+
+  // ---- service modules
+  const spinners: Spinner[] = [];
+  const modules = services.map((svc, k) => {
+    const root = new THREE.Group();
+    root.position.set(handoffs[k].x, 0, MODULE_Z);
+    const body = new THREE.Group();
+    root.add(body);
+    group.add(root);
+    const P = (g: THREE.BufferGeometry, x: number, y: number, z: number, ry = 0) => { const o = mesh(g, mat.porcelain); o.position.set(x, y, z); o.rotation.y = ry; body.add(o); return o; };
+    const C = (g: THREE.BufferGeometry, x: number, y: number, z: number) => { const o = mesh(g, mat.charcoal); o.position.set(x, y, z); body.add(o); return o; };
+    const spin = (obj: THREE.Object3D, axis: Spinner['axis'], own: number, ratio: number, x: number, y: number, z: number) => {
+      obj.position.set(x, y, z);
+      body.add(obj);
       spinners.push({ obj, axis, own, ratio });
     };
-    const mesh = (g: THREE.BufferGeometry, m: THREE.Material) => {
-      const o = new THREE.Mesh(g, m);
-      o.castShadow = true;
-      o.receiveShadow = true;
-      return o;
-    };
 
-    // Pad and the three channel ports every station shares (both ring sides, one towards the engine).
-    P(puckGeometry(PAD_R, 0.1), new THREE.Matrix4());
-    P(cyl(0.075, 0.16, 16), place(PAD_R - 0.06, CH_Y, 0, 0, 0, Math.PI / 2));
-    P(cyl(0.075, 0.16, 16), place(-PAD_R + 0.06, CH_Y, 0, 0, 0, Math.PI / 2));
-    P(cyl(0.075, 0.16, 16), place(0, CH_Y, PAD_R - 0.06, 0, Math.PI / 2));
+    P(puckGeometry(0.44, 0.08), 0, 0, 0);
+    // docking arm reaching to the track, ends in a clamp just behind the rail
+    P(box(0.1, 0.06, 0.7), 0, CH_Y + 0.02, 0.5);
+    C(box(0.16, 0.1, 0.08), 0, CH_Y + 0.02, 0.86);
+    C(cyl(0.025, CH_Y), 0, CH_Y / 2, 0.42);
 
-    const id: StationId = s.id;
-    if (id === 'strategy') {
-      // stepped tower with a turning compass arm on top
-      P(box(0.72, 0.26, 0.72), place(0, 0.23, 0));
-      P(box(0.52, 0.24, 0.52), place(0, 0.48, 0));
-      P(box(0.32, 0.3, 0.32), place(0, 0.75, 0));
-      C(cyl(0.035, 0.05), place(0, 0.925, 0));
-      const arm = new THREE.Group();
-      arm.add(mesh(box(0.42, 0.022, 0.035), mat.charcoal));
-      arm.children[0].position.x = 0.1;
-      spin(arm, 'y', 0.9, 1, 0, 0.955, 0);
-    } else if (id === 'outbound') {
-      // sending block with a sweeping antenna arm
-      P(box(0.74, 0.36, 0.56), place(0, 0.28, 0));
-      C(box(0.5, 0.05, 0.4), place(0, 0.485, 0));
-      P(cyl(0.04, 0.24), place(0.12, 0.62, -0.06));
+    const id: ServiceId = svc.id;
+    if (id === 'outbound') {
+      P(box(0.56, 0.3, 0.42), 0, 0.23, -0.05);
+      C(box(0.4, 0.04, 0.3), 0, 0.4, -0.05);
+      P(cyl(0.035, 0.22), 0.1, 0.52, -0.08);
       const sweep = new THREE.Group();
-      const a = mesh(box(0.38, 0.03, 0.05), mat.charcoal);
-      a.position.x = 0.14;
-      const tip = mesh(new THREE.SphereGeometry(0.045, 16, 12), mat.charcoal);
-      tip.position.x = 0.33;
+      const a = mesh(box(0.34, 0.03, 0.045), mat.charcoal); a.position.x = 0.13;
+      const tip = mesh(new THREE.SphereGeometry(0.042, 16, 12), mat.charcoal); tip.position.x = 0.3;
       sweep.add(a, tip);
-      spin(sweep, 'y', -1.6, 1, 0.12, 0.75, -0.06);
+      spin(sweep, 'y', -1.6, 1, 0.1, 0.64, -0.08);
     } else if (id === 'paid') {
-      // turning billboard on a round base
-      P(puckGeometry(0.32, 0.14), place(0, 0.1, 0));
+      P(puckGeometry(0.28, 0.12), 0, 0.08, 0);
       const bb = new THREE.Group();
-      const postL = mesh(cyl(0.022, 0.42, 10), mat.charcoal);
-      const postR = postL.clone();
-      postL.position.set(-0.28, 0.21, 0);
-      postR.position.set(0.28, 0.21, 0);
-      const panel = mesh(box(0.8, 0.42, 0.045), mat.porcelain);
-      panel.position.y = 0.58;
-      const rim = mesh(box(0.84, 0.04, 0.06), mat.charcoal);
-      rim.position.y = 0.36;
-      bb.add(postL, postR, panel, rim);
-      spin(bb, 'y', 0.45, 0.5, 0, 0.24, 0);
+      const l = mesh(cyl(0.02, 0.38, 10), mat.charcoal), r = l.clone();
+      l.position.set(-0.25, 0.19, 0); r.position.set(0.25, 0.19, 0);
+      const panel = mesh(box(0.72, 0.38, 0.04), mat.porcelain); panel.position.y = 0.53;
+      const rim = mesh(box(0.76, 0.035, 0.055), mat.charcoal); rim.position.y = 0.33;
+      bb.add(l, r, panel, rim);
+      spin(bb, 'y', 0.5, 0.5, 0, 0.2, 0);
     } else if (id === 'content') {
-      // a stack of pages; the glass top sheet turns
-      [[0.13, 0], [0.2, 0.14], [0.27, -0.1]].forEach(([y, r]) => P(box(0.66, 0.06, 0.48), place(0, y, 0, r)));
-      C(box(0.05, 0.26, 0.5), place(-0.36, 0.23, 0));
+      [[0.11, 0], [0.17, 0.14], [0.23, -0.1]].forEach(([y, ry]) => P(box(0.58, 0.055, 0.42), 0, y, 0, ry));
+      C(box(0.045, 0.22, 0.44), -0.31, 0.2, 0);
       const sheet = new THREE.Group();
-      const g = new THREE.Mesh(box(0.62, 0.035, 0.46), mat.glass);
-      g.castShadow = false;
-      const spine = mesh(box(0.62, 0.012, 0.03), mat.charcoal);
-      spine.position.set(0, 0.024, 0.2);
+      const g = new THREE.Mesh(box(0.54, 0.032, 0.4), mat.glass);
+      const spine = mesh(box(0.54, 0.012, 0.028), mat.charcoal); spine.position.set(0, 0.022, 0.18);
       sheet.add(g, spine);
-      spin(sheet, 'y', 0.6, 0.5, 0, 0.345, 0);
+      spin(sheet, 'y', 0.6, 0.5, 0, 0.3, 0);
     } else if (id === 'abm') {
-      // targeting gyroscope: two nested rings on a drum
-      P(puckGeometry(0.36, 0.3), place(0, 0.1, 0));
-      C(cyl(0.05, 0.12), place(0, 0.46, 0));
-      const outer = mesh(new THREE.TorusGeometry(0.25, 0.02, 10, 48), mat.charcoal);
-      const inner = mesh(new THREE.TorusGeometry(0.15, 0.018, 10, 40), mat.charcoal);
+      P(puckGeometry(0.32, 0.28), 0, 0.08, 0);
+      C(cyl(0.045, 0.1), 0, 0.41, 0);
+      const outer = mesh(new THREE.TorusGeometry(0.22, 0.018, 10, 48), mat.charcoal);
+      const inner = mesh(new THREE.TorusGeometry(0.13, 0.016, 10, 40), mat.charcoal);
       inner.rotation.y = Math.PI / 2;
       outer.add(inner);
-      const dot = mesh(new THREE.SphereGeometry(0.05, 16, 12), mat.porcelain);
+      const dot = mesh(new THREE.SphereGeometry(0.045, 16, 12), mat.pink);
       outer.add(dot);
-      spin(outer, 'y', -1.1, 1, 0, 0.78, 0);
+      spin(outer, 'y', -1.1, 1, 0, 0.7, 0);
     } else if (id === 'revops') {
-      // a block with two meshing gears standing on it
-      P(box(0.72, 0.28, 0.6), place(0, 0.24, 0));
-      C(box(0.56, 0.04, 0.12), place(0, 0.4, 0));
-      const g1 = mesh(gearGeometry(0.21, 0.17, 12, 0.06, 0.04), mat.charcoal);
-      const g2 = mesh(gearGeometry(0.15, 0.115, 9, 0.06, 0.03), mat.charcoal);
-      g1.rotation.x = Math.PI / 2;
-      g2.rotation.x = Math.PI / 2;
+      P(box(0.62, 0.26, 0.5), 0, 0.21, 0);
+      C(box(0.5, 0.035, 0.1), 0, 0.355, 0);
+      const g1 = mesh(gearGeometry(0.19, 0.155, 12, 0.055, 0.035), mat.charcoal);
+      const g2 = mesh(gearGeometry(0.135, 0.104, 9, 0.055, 0.028), mat.charcoal);
+      g1.rotation.x = g2.rotation.x = Math.PI / 2;
       const h1 = new THREE.Group(); h1.add(g1);
       const h2 = new THREE.Group(); h2.add(g2);
-      spin(h1, 'z', 1.2, 1, -0.13, 0.62, 0);
-      spin(h2, 'z', -1.2 * (12 / 9), -12 / 9, 0.215, 0.56, 0);
+      spin(h1, 'z', 1.2, 1, -0.11, 0.56, 0);
+      spin(h2, 'z', -1.6, -12 / 9, 0.195, 0.505, 0);
     }
+    return { root, body };
   });
 
-  const pMesh = new THREE.Mesh(merge(porcelain), mat.porcelain);
-  const cMesh = new THREE.Mesh(merge(charcoal), mat.charcoal);
-  for (const m of [pMesh, cMesh]) { m.castShadow = true; m.receiveShadow = true; group.add(m); }
-
-  // Activity lights: one small puck per station on the engine side, grey at rest, pink when working.
-  const lights = new THREE.InstancedMesh(puckGeometry(0.075, 0.045, 0.015, 24), mat.pink, stations.length);
+  // Activity lights: a puck on each module pad, grey at rest, pink while its handoff is working.
+  const lights = new THREE.InstancedMesh(puckGeometry(0.07, 0.045, 0.015, 24), mat.pink, services.length);
   const off = new THREE.Color(0xdcd6d5), on = new THREE.Color(0xe58fab), tmp = new THREE.Color();
   const m4 = new THREE.Matrix4();
-  stations.forEach((s, k) => {
-    const [x, , z] = at(s.deg, R - PAD_R + 0.13, 0.1);
-    lights.setMatrixAt(k, m4.makeTranslation(x, 0.1, z));
-    lights.setColorAt(k, off);
-  });
-  lights.receiveShadow = true;
   group.add(lights);
 
   const angles = new Float32Array(spinners.length);
 
   return {
     group,
-    /** dt: frame delta (s); engineSpeed: rad/s of the engine; sync 0..1; activity per station 0..1 */
-    update(dt: number, engineSpeed: number, sync: number, activity: Float32Array) {
+    update(st: { modules: number[]; sync: number }, dt: number, engineSpeed: number, activity: Float32Array) {
+      modules.forEach((m, k) => {
+        const a = st.modules[k];
+        m.root.visible = a > 0.002;
+        m.body.position.y = (1 - a) * DROP;
+        m.body.scale.setScalar(0.6 + 0.4 * Math.min(1, a));
+      });
       spinners.forEach((sp, i) => {
-        const v = sp.own * (1 - sync) + engineSpeed * sp.ratio * sync;
-        angles[i] += v * dt;
+        angles[i] += (sp.own * (1 - st.sync) + engineSpeed * sp.ratio * st.sync) * dt;
         sp.obj.rotation[sp.axis] = angles[i];
       });
-      for (let k = 0; k < stations.length; k++) {
-        const a = activity[k];
+      services.forEach((_, k) => {
+        const a = activity[k] * Math.min(1, st.modules[k]);
         lights.setColorAt(k, tmp.copy(off).lerp(on, a));
-        const [x, , z] = at(stations[k].deg, R - PAD_R + 0.13, 0.1);
-        m4.makeScale(1 + a * 0.25, 1 + a * 0.8, 1 + a * 0.25).setPosition(x, 0.1, z);
+        const s = Math.max(1e-4, Math.min(1, st.modules[k]));
+        m4.makeScale(s * (1 + a * 0.25), s * (1 + a * 0.9), s * (1 + a * 0.25))
+          .setPosition(handoffs[k].x + 0.3, 0.08 + (1 - Math.min(1, st.modules[k])) * DROP, MODULE_Z + 0.28);
         lights.setMatrixAt(k, m4);
-      }
+      });
       lights.instanceColor!.needsUpdate = true;
       lights.instanceMatrix.needsUpdate = true;
     },
