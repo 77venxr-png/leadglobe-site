@@ -267,7 +267,7 @@ html.header-away .header { translate: 0 -100%; }
   mask-image: radial-gradient(60% 70% at 78% 52%, #000 20%, transparent 75%);
 }
 .hero__copy { grid-column: 1 / span 6; display: grid; gap: 1.6rem; align-content: center; }
-.hero__title { font-size: var(--t-xl); line-height: 0.98; letter-spacing: -0.045em; max-width: 11ch; }
+.hero__title { font-size: clamp(2.35rem, 1.35rem + 3.3vw, 4.25rem); line-height: 1; letter-spacing: -0.045em; max-width: 15ch; }
 .hero__lede { color: var(--c-muted); max-width: 46ch; font-size: clamp(1.0625rem, 1rem + 0.2vw, 1.1875rem); }
 .hero__actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.4rem; }
 .hero__visual { grid-column: 7 / -1; }
@@ -275,6 +275,62 @@ html.header-away .header { translate: 0 -100%; }
   .hero { min-height: 0; row-gap: 2.5rem; }
   .hero__copy, .hero__visual { grid-column: 1 / -1; }
   .hero::before { mask-image: radial-gradient(90% 40% at 50% 80%, #000 20%, transparent 80%); }
+}
+
+
+/* Revenue engine (home hero): 3D model on a plinth, DOM labels projected over the canvas */
+.gtm { position: relative; margin: 0; container-type: inline-size; }
+.gtm__stage { position: relative; aspect-ratio: 1 / 0.9; }
+.gtm__canvas, .gtm__poster { position: absolute; inset: 0; width: 100%; height: 100%; }
+.gtm__canvas { opacity: 0; transition: opacity 1s var(--ease-ui); }
+.gtm__poster { display: none; object-fit: contain; }
+html:not(.js) .gtm__poster, .gtm[data-mode='poster'] .gtm__poster { display: block; }
+.gtm[data-mode='gl'] .gtm__canvas, .gtm[data-mode='still'] .gtm__canvas { opacity: 1; }
+.gtm__tags { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity 0.6s var(--ease-ui) 0.35s; }
+.gtm[data-mode='gl'] .gtm__tags, .gtm[data-mode='still'] .gtm__tags { opacity: 1; }
+.gtm__tag, .gtm__final { position: absolute; left: 0; top: 0; white-space: nowrap; will-change: transform; }
+.gtm__tag {
+  font: 500 0.6875rem/1 var(--f-mono); letter-spacing: 0.02em; color: var(--c-fg);
+  padding: 0.38rem 0.6rem; border-radius: 999px; margin-top: -6px;
+  background: rgb(255 255 255 / 0.94); border: 1px solid var(--c-line); box-shadow: var(--shadow);
+  transition: background-color 0.35s var(--ease-ui), color 0.35s var(--ease-ui), border-color 0.35s var(--ease-ui);
+}
+.gtm__short { display: none; }
+.gtm__tag.is-active { background: var(--c-fg); border-color: var(--c-fg); color: #fff; }
+.gtm__tag--in { color: var(--c-muted); background: transparent; border-color: transparent; box-shadow: none; }
+.gtm__tag--out { background: var(--c-pink); border-color: transparent; margin-top: 0; }
+.gtm__final {
+  font: 600 clamp(0.95rem, 0.75rem + 1.2cqi, 1.2rem)/1 var(--f-display); letter-spacing: -0.02em;
+  background: var(--c-fg); color: #fff; padding: 0.6em 1em 0.65em; border-radius: 999px;
+  box-shadow: var(--shadow); opacity: 0;
+}
+.gtm__bar { display: flex; align-items: center; gap: 1rem; margin-top: 0.4rem; }
+.gtm__track { position: relative; flex: 1; padding-bottom: 0.7rem; }
+.gtm__steps {
+  list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.3rem 1.1rem;
+  font: 500 0.6875rem/1.2 var(--f-mono); letter-spacing: 0.02em; color: var(--c-muted);
+}
+.gtm__steps li { transition: color 0.3s var(--ease-ui); }
+.gtm__steps b { font-weight: 500; opacity: 0.6; margin-right: 0.15em; }
+.gtm__steps li.is-on { color: var(--c-fg); }
+.gtm__progress { position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--c-line); }
+.gtm__progress > i { display: block; height: 100%; background: var(--c-pink-deep); transform-origin: 0 50%; transform: scaleX(0); }
+.gtm[data-mode='still'] .gtm__progress > i { transform: none; }
+.gtm__pause {
+  font: 500 0.6875rem/1 var(--f-mono); letter-spacing: 0.02em; color: var(--c-fg); cursor: pointer;
+  padding: 0.55rem 0.85rem; min-height: 28px; border-radius: 999px; background: var(--c-bg); border: 1px solid var(--c-line-2);
+  transition: background-color 0.3s var(--ease-ui), translate 0.3s var(--ease-ui);
+}
+.gtm__pause:active { translate: 0 1px; }
+.gtm__pause:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+@media (hover: hover) { .gtm__pause:hover { background: var(--c-pink); border-color: transparent; } }
+.gtm:not([data-mode='gl']) .gtm__pause { visibility: hidden; }
+html:not(.js) .gtm__bar, .gtm[data-mode='poster'] .gtm__bar { display: none; }
+@container (max-width: 460px) {
+  .gtm__tag { font-size: 0.625rem; padding: 0.3rem 0.45rem; }
+  .gtm__long, .gtm__tag--in { display: none; }
+  .gtm__short { display: inline; }
+  .gtm__steps li:not(.is-on) span { display: none; }
 }
 
 /* Orbit: the business at the centre, five services passing work around it */

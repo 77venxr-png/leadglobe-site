@@ -136,3 +136,40 @@ Mechanics (`src/components/Orbit.tsx`, one gsap.ticker driver):
 - Reduced motion and no-JS: the first handoff is drawn at rest (both nodes lit, trail, outcome), so the still frame still explains a handoff.
 - Phones (orbit container ≤ 520px): short names on the nodes, statuses hidden, one ink caption line under the orbit narrates the current handoff.
 - Outcomes describe the work's intended contribution, not results. Activity lines are sample data.
+
+## Hero v3: the revenue engine (2026-11-04)
+
+Owner brief: a miniature 3D GTM ecosystem that tells one story in a 12 s loop: siloed stations,
+leaking pipeline, leadglobe connects them, connected execution, revenue. The orbit stays on the
+service pages; the home hero gets the engine.
+
+```
+Idea:        Opportunities leak between disconnected GTM teams; leadglobe connects them into one engine.
+Metaphor:    a porcelain architectural model on a plinth: stations, channels, a central mechanism.
+Signature:   the gaps close. Charcoal rails grow out of the assembling engine into every station,
+             the broken white channels are bridged, and the same black spheres that fell
+             through the gaps now flow through every station into the revenue bowl.
+Emotion:     calm precision, then relief: "nothing gets lost any more".
+Motion verb: route (unchanged). Spheres travel lines, parts drop in and lock, rails draw.
+Screenshot:  the assembled model, bowl filling, "one connected gtm engine." above the hub.
+```
+
+Scene plan (world units, plinth radius 4.9, channel height 0.34):
+- Six stations on a ring (r 3.0, every 60°): paid media 0°, revops 60°, abm 120°, content 180°,
+  gtm strategy 240°, outbound 300°. Back gap (270°): the prospect hopper. Front gap (90°): the
+  revenue bowl, nearest the camera.
+- Fragmented (white channels): ring arcs with gaps at 30°, 150°, 210° and a broken spur to the
+  bowl. Pink drain rings mark the gaps. Station mechanisms spin at their own speeds.
+- Connected (charcoal = leadglobe): engine drops in part by part, 8 radial rails draw out from it,
+  gaps are bridged in charcoal, drains close, station mechanisms lock to the engine's rhythm.
+- Loop (12 s): 0 siloed, 1.2–4.6 leakage, 4.6–6.2 connect, 6.0–10.2 flow, 9.8–11.2 revenue label,
+  11.2–12 reset (reverse assembly) back to frame 0.
+
+Implementation: plain three (lazy `import()` after first paint, only when the hero is visible),
+driven by gsap.ticker. No R3F: it brings its own render loop and would break the one-clock rule.
+Modules in `src/components/gtm/scene/`: layout (geometry constants, routes), GTMAnimationController
+(pure time → state), GTMStations, RevenuePipeline, GTMEngine, CustomerSpheres, GTMScene (renderer,
+camera, lights, per-frame apply). `GTMHero.tsx` owns the DOM: poster image, canvas, projected
+labels, stage strip, pause button.
+Fallbacks: reduced motion renders one still 3D frame of the finished state; no WebGL, Save-Data
+or low-memory devices keep the poster image (a capture of that same frame).

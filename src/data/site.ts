@@ -53,10 +53,10 @@ export const nav = [
 ];
 
 export const hero = {
-  eyebrow: 'go-to-market services',
-  headline: 'turn your gtm plans into execution.',
+  eyebrow: 'ai-native gtm agency',
+  headline: 'strategy + connected execution to fix your pipeline leakage.',
   copy:
-    'From outbound and paid media to content and RevOps, we build and run the systems that move your go-to-market forward.',
+    'We set your go-to-market strategy, then run outbound, ABM, paid media, content and RevOps as one connected system, so qualified buyers stop slipping through the gaps between teams and tools.',
 };
 
 export const servicesIntro = {

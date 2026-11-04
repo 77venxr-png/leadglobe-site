@@ -1,6 +1,6 @@
 import { Button } from '@/components/Button';
 import { ContactForm } from '@/components/ContactForm';
-import { Orbit } from '@/components/Orbit';
+import { GTMHero } from '@/components/gtm/GTMHero';
 import { Route } from '@/components/Route';
 import { ServiceTabs } from '@/components/ServiceTabs';
 import { about, contactHref, engagement, faq, finalCta, hero, howItWorks, principles, servicesIntro, site } from '@/data/site';
@@ -25,7 +25,7 @@ export default function Home() {
           </div>
         </div>
         <div className="hero__visual" data-reveal="fade" data-intro data-delay="0.15">
-          <Orbit />
+          <GTMHero />
         </div>
       </section>
 
