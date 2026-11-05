@@ -100,8 +100,8 @@ rgb(11 11 18/.06)`.
 
 ### Composition plan
 ```
-HERO      | eyebrow · h1 (cols 1-7)          | orbit visual (cols 7-12): globe + -30° ring, 5 service chips ride it
-          | copy · two CTAs                  |
+HERO      | eyebrow · h1 (cols 1-8)          | lede · two CTAs (cols 9-12)
+STORY     | pinned full-width pipeline: chapter caption · 3D model · six-stage scoreboard (scroll = time)
 SERVICES  | ─ full width tab bar (5) ───────────────────────────────────────────── |
           | label · h3 · copy · learn more   | workflow canvas (dotted, cards+connectors)    |
           | 01..06 numbered list             |                                                |
@@ -188,3 +188,41 @@ Phones and touch: 30 fps cap, DPR 1.25, shadow map updated every third frame.
 Fallbacks: reduced motion renders one still 3D frame at t 11.6 (the fixed pipeline); no WebGL,
 Save-Data or low-memory devices get `public/hero/gtm-engine.png`, a capture of the same frame
 (`?gtm-still=11.6`). Regenerate it whenever the scene changes.
+
+## Hero v4: the pipeline, full width, told by scroll (2026-11-05)
+
+Owner verdict on v3: the message lands, but it looked clumsy: small and compact. Cause: a long
+diagonal model squeezed into cols 7-12 at 1 : 0.9, thirteen 11px pills on the track at once, and
+the proof numbers ("was 3 → 12") as the smallest text on screen.
+
+```
+Idea:        Same story, given the room it needs: one wide panorama, and scroll is the clock.
+Signature:   the reader closes the gaps by scrolling; the scoreboard climbs past the struck-out
+             old numbers.
+Screenshot:  chapter 03, 9 accounts in the pink tray, scoreboard 16 / ~10~ 15 / ~6~ 13 / ~3~ 12 /
+             ~1~ 10 / ~0~ 9.
+```
+
+Layout:
+- Intro: h1 cols 1-8, lede + CTAs hang at cols 9-12. The pipeline's top edge shows in the fold.
+- `.story`: on desktop with a fine pointer (`SCROLL_MQ` in `GTMHero.tsx`, the same query in
+  globals.css) the section is 340vh and `.story__pin` sticks under the header. The stage runs
+  nearly edge to edge (gutter only, up to 1840px); caption and footer re-align to the content column.
+- Three chapters (`hero.chapters` in site.ts), one big caption at a time: 01 leaks (t 0-4.9),
+  02 gaps close (4.9-6.6), 03 closed won (6.6-12.05). Each chapter gets an equal share of the scroll
+  with short holds between them (`CHAPTER_T`, `scrollToStory`). The shown time eases towards the
+  scroll target, so wheel steps glide; spheres and counts are pure functions of t, so scrubbing
+  back works.
+- Scoreboard: six big tabular numbers under the stages (columns placed at each stage's projected
+  screen x), stage name in mono, the leaking run's count struck through (pink) from chapter 03.
+- Tags on the model: all five services + gtm strategy while the modules dock, then only the service
+  whose handoff a sphere is crossing. "the market" and the final pill are gone; the caption says it.
+
+Camera: yaw and elevation follow the frame aspect (`YAW_WIDE/-SQUARE`, `EL_WIDE/-SQUARE` in
+layout.ts). Wide frames turn the track to nearly left to right at 42°; square frames (phones) keep
+the v3 diagonal at 50°.
+
+Modes: phones / touch / < 900px autoplay the 13 s loop unpinned (pause in the footer row, scoreboard
+cut to accounts / meeting / closed won). Reduced motion: unpinned still frame, chapter 03. Poster
+(no WebGL): unpinned, even six-column scoreboard with the fixed counts. The poster image is now a
+16 : 9 capture at the wide camera.

@@ -7,24 +7,22 @@ import { createStations } from './GTMStations';
 import { createPipeline, slab } from './RevenuePipeline';
 import { story, type StoryState } from './GTMAnimationController';
 import {
-  MARKET, MODULE_Z, PLINTH, TRAY, YAW, handoffs, stages, type Vec,
+  CH_Y, EL_SQUARE, EL_WIDE, MARKET, MODULE_Z, PLINTH, TRAY, YAW_SQUARE, YAW_WIDE, handoffs, stages, type Vec,
 } from './layout';
 import { createMaterials } from './materials';
 
 export type SceneInput = { pointerX: number; pointerY: number; scroll: number; time: number };
 export type GTMSceneHandle = ReturnType<typeof createGTMScene>;
 
-/** Label anchors in model space: 6 stages, 5 services, strategy, market, final label.
- *  Stage counts sit on the plinth in front of the track (tags hang below the anchor);
- *  service tags float above the modules behind it, so the two rows never collide. */
+/** Label anchors in model space: 6 stages (track level: the scoreboard aligns its columns to
+ *  their screen x), 5 services (above the modules), gtm strategy (above the market). */
 export const anchors: Vec[] = [
-  ...stages.slice(0, -1).map((s) => [s.x, 0.02, 0.62] as Vec),
-  [TRAY[0], 0.02, TRAY[2] + 0.72],
+  ...stages.slice(0, -1).map((s) => [s.x, CH_Y, 0] as Vec),
+  [TRAY[0], 0.02, TRAY[2]],
   ...handoffs.map((h) => [h.x, 1.0, MODULE_Z - 0.05] as Vec),
   [MARKET.x, 0.7, MARKET.z - 1.45],
-  [MARKET.x - 0.2, 0.02, MARKET.z + 1.4],
-  [TRAY[0] - 0.9, 1.15, PLINTH.z0 + 0.3],
 ];
+export const N_ANCHORS = anchors.length;
 
 export function createGTMScene(canvas: HTMLCanvasElement, opts: { lowPower: boolean }) {
   const renderer = new THREE.WebGLRenderer({
@@ -66,7 +64,7 @@ export function createGTMScene(canvas: HTMLCanvasElement, opts: { lowPower: bool
 
   // Model root: everything in pipeline space, turned so the won end comes towards the camera.
   const root = new THREE.Group();
-  root.rotation.y = YAW;
+  root.rotation.y = YAW_SQUARE;
   scene.add(root);
 
   const plinth = new THREE.Mesh(slab(PLINTH.x1 - PLINTH.x0, PLINTH.z1 - PLINTH.z0, PLINTH.h, PLINTH.r, 0.06), mat.plinth);
@@ -94,16 +92,28 @@ export function createGTMScene(canvas: HTMLCanvasElement, opts: { lowPower: bool
   root.add(stationsM.group, pipeline.group, engine.group, spheres.mesh, spheres.rings);
   root.updateMatrixWorld(true);
 
-  // Camera rig: frames the whole plinth (and its labels) for any aspect ratio.
-  const box = new THREE.Box3(new THREE.Vector3(PLINTH.x0, -PLINTH.h, PLINTH.z0 - 0.2), new THREE.Vector3(PLINTH.x1, 1.35, PLINTH.z1 + 0.35));
-  const corners = Array.from({ length: 8 }, (_, i) => new THREE.Vector3(
+  // Camera rig: frames the whole plinth (and the service tags above it) for any aspect ratio.
+  // Wide frames turn the track towards left-to-right and lower the camera; square ones keep the
+  // diagonal so the long model still fits.
+  const box = new THREE.Box3(new THREE.Vector3(PLINTH.x0, -PLINTH.h, PLINTH.z0 - 0.2), new THREE.Vector3(PLINTH.x1, 1.35, PLINTH.z1 + 0.15));
+  const local = Array.from({ length: 8 }, (_, i) => new THREE.Vector3(
     i & 1 ? box.max.x : box.min.x, i & 2 ? box.max.y : box.min.y, i & 4 ? box.max.z : box.min.z,
-  ).applyMatrix4(root.matrixWorld));
-  const target = new THREE.Vector3(0.3, 0.1, -0.7).applyMatrix4(root.matrixWorld);
+  ));
+  const corners = local.map((c) => c.clone());
+  const target = new THREE.Vector3();
   const cam = { az: Number.NaN, el: Number.NaN };
-  const BASE_EL = 50;
+  let baseEl = EL_SQUARE;
   let fitDist = 30;
   const v = new THREE.Vector3();
+
+  function orient(aspect: number) {
+    const k = THREE.MathUtils.smoothstep(aspect, 1.1, 2.2);
+    root.rotation.y = THREE.MathUtils.lerp(YAW_SQUARE, YAW_WIDE, k);
+    baseEl = THREE.MathUtils.lerp(EL_SQUARE, EL_WIDE, k);
+    root.updateMatrixWorld(true);
+    local.forEach((c, i) => corners[i].copy(c).applyMatrix4(root.matrixWorld));
+    target.set(0.0, 0.1, -0.85).applyMatrix4(root.matrixWorld);
+  }
 
   function pose(az: number, el: number, d: number) {
     camera.position.set(
@@ -115,14 +125,14 @@ export function createGTMScene(canvas: HTMLCanvasElement, opts: { lowPower: bool
     camera.updateMatrixWorld();
   }
   function fit() {
-    const az = THREE.MathUtils.degToRad(-2), el = THREE.MathUtils.degToRad(BASE_EL);
+    const az = THREE.MathUtils.degToRad(-2), el = THREE.MathUtils.degToRad(baseEl);
     let d = 30;
     for (let i = 0; i < 6; i++) {
       pose(az, el, d);
       let m = 0;
       for (const c of corners) {
         v.copy(c).project(camera);
-        m = Math.max(m, Math.abs(v.x) / 0.9, Math.abs(v.y) / 0.9);
+        m = Math.max(m, Math.abs(v.x) / 0.97, Math.abs(v.y) / 0.94);
       }
       d *= m;
     }
@@ -131,8 +141,8 @@ export function createGTMScene(canvas: HTMLCanvasElement, opts: { lowPower: bool
 
   function placeCamera(st: StoryState, input: SceneInput) {
     const idle = Math.sin((input.time / 26) * Math.PI * 2);
-    const az = THREE.MathUtils.degToRad(-2 + idle * 1.6 + input.pointerX * 3);
-    const el = THREE.MathUtils.degToRad(BASE_EL + input.scroll * 7 - input.pointerY * 2.5);
+    const az = THREE.MathUtils.degToRad(-2 + idle * 1.2 + input.pointerX * 2);
+    const el = THREE.MathUtils.degToRad(baseEl + input.scroll * 7 - input.pointerY * 2);
     if (Number.isNaN(cam.az)) { cam.az = az; cam.el = el; }
     cam.az += (az - cam.az) * 0.06;
     cam.el += (el - cam.el) * 0.06;
@@ -148,7 +158,9 @@ export function createGTMScene(canvas: HTMLCanvasElement, opts: { lowPower: bool
       renderer.setSize(w, h, false);
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
+      orient(w / h);
       fit();
+      cam.az = Number.NaN; // re-seat the camera at the new pose
     },
     /** Render the story at loop time t. dt drives the integrated spins. */
     frame(t: number, dt: number, input: SceneInput, snap = false) {

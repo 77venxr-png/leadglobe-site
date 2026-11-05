@@ -20,7 +20,13 @@ export const RESET_AT = 12.3;
 const kept = (t: number, i = 0) => 1 - seg(t, RESET_AT + i * 0.05, 0.45, easeIn);
 
 export const STAGES = ['leaking', 'fixing', 'connected', 'revenue'] as const;
-export const STAGE_NAMES = ['leaking pipeline', 'strategy + connection', 'connected pipeline', 'revenue'];
+
+/** The three told chapters: 0 leaking, 1 gaps closing, 2 connected run + revenue. */
+export const chapterAt = (stage: number) => (stage >= 2 ? 2 : stage);
+
+/** Scroll story: where each chapter starts and ends in loop time. The scroll map gives every
+ *  chapter an equal share of the pinned distance, with a short hold between them. */
+export const CHAPTER_T: [number, number][] = [[0, 4.9], [4.9, 6.6], [6.6, 12.05]];
 
 export type StoryState = {
   t: number;

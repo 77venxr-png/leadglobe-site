@@ -57,6 +57,12 @@ export const hero = {
   headline: 'strategy + connected execution to fix your pipeline leakage.',
   copy:
     'We set your go-to-market strategy, then run outbound, ABM, paid media, content and RevOps as one connected system, so qualified buyers stop slipping through the gaps between teams and tools.',
+  // The three chapters of the hero pipeline (scroll drives them on desktop).
+  chapters: [
+    'prospects leak at every handoff.',
+    'strategy + connected execution closes the gaps.',
+    'the right accounts reach closed won.',
+  ],
 };
 
 export const servicesIntro = {

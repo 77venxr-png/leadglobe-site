@@ -18,13 +18,19 @@ export default function Home() {
         <div className="hero__copy">
           <p className="label" data-reveal="fade" data-intro>{hero.eyebrow}</p>
           <h1 id="hero-title" className="hero__title" data-split="lines" data-intro>{hero.headline}</h1>
+        </div>
+        <div className="hero__side">
           <p className="hero__lede">{hero.copy}</p>
           <div className="hero__actions" data-reveal="up" data-intro data-delay="0.35">
             <Button href={contactHref} arrow>{site.cta.primary}</Button>
             <Button href="#services" variant="line">{site.cta.secondary}</Button>
           </div>
         </div>
-        <div className="hero__visual" data-reveal="fade" data-intro data-delay="0.15">
+      </section>
+
+      {/* The pipeline story. Desktop: a tall track with a sticky stage, scroll drives the chapters. */}
+      <section className="story" aria-label="how leakage gets fixed">
+        <div className="story__pin" data-reveal="fade" data-intro data-delay="0.15">
           <GTMHero />
         </div>
       </section>

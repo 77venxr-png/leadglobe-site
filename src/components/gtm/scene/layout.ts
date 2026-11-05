@@ -1,10 +1,15 @@
 // Shared geometry of the sales-pipeline model. Pure data: no three.js objects, no time.
 // Pipeline space: the track runs along +x at z = 0 (market on the left, closed won on the right);
-// service modules dock behind it (−z). The scene rotates the whole model by YAW so the won end
+// service modules dock behind it (âˆ’z). The scene rotates the whole model by a yaw so the won end
 // comes towards the camera.
 
 export const CYCLE = 13; // seconds per loop
-export const YAW = -0.74; // radians: the pipeline runs diagonally, market far left, closed won near right
+// Yaw and camera elevation follow the frame's aspect: a wide frame (the pinned desktop panorama)
+// shows the track almost left to right; a squarer frame (phones) turns it diagonal to fit.
+export const YAW_WIDE = -0.3; // radians, at aspect >= 2.2
+export const YAW_SQUARE = -0.74; // at aspect <= 1.1: market far left, closed won near right
+export const EL_WIDE = 42; // degrees
+export const EL_SQUARE = 50;
 
 export const CH_Y = 0.34; // track centre height
 export const CH_R = 0.04; // track rail radius
@@ -42,7 +47,7 @@ export const TRACK_START = -5.15;
 export const TRACK_END = 4.75;
 export const TRAY: Vec = [5.55, 0, 0];
 
-/** The market: a 5 × 7 grid of prospect accounts on a tray at the left. */
+/** The market: a 5 Ã— 7 grid of prospect accounts on a tray at the left. */
 export const MARKET = { x: -6.45, z: -0.15, cols: 5, rows: 7, gap: 0.34, y: 0.24 };
 export const marketSlots: Vec[] = (() => {
   const s: Vec[] = [];
@@ -60,7 +65,7 @@ export const STRATEGY: Vec = [MARKET.x, 0, MARKET.z];
 /** Plinth: a rounded slab under everything. */
 export const PLINTH = { x0: -7.55, x1: 6.55, z0: -2.8, z1: 1.05, h: 0.26, r: 0.55 };
 
-/** Resting places in the closed-won tray (3 × 3). */
+/** Resting places in the closed-won tray (3 Ã— 3). */
 export const traySlots: Vec[] = Array.from({ length: 9 }, (_, i) => [
   TRAY[0] + ((i % 3) - 1) * 0.27, 0.24, TRAY[2] + (Math.floor(i / 3) - 1) * 0.27,
 ]);
@@ -87,3 +92,5 @@ export const sphereSpecs: SphereSpec[] = [
 
 /** Final per-stage counts of the leaking run (what "was" shows during the connected run). */
 export const wasCounts = stages.map((_, g) => LEAK0.filter((f) => f >= g).length);
+/** Final per-stage counts of the connected run (server render, no-JS and poster fallback). */
+export const fixedCounts = stages.map((_, g) => FATE1.filter((f) => f >= g).length);
