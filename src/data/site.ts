@@ -77,6 +77,67 @@ export const hero = {
   },
 };
 
+// The console: one shift of work in the run log, between the engine and services. Named agents
+// post rows; anything that represents the client's brand waits at an approval gate.
+// OWNER TO CONFIRM: the operating model (agents research, watch signals, draft and route; a person
+// approves anything brand-facing) and that the client ("your team") is the approver.
+// Records are fictional and reused from the workflow illustrations (flow/workflows.tsx).
+export type RunStatus = 'running' | 'done' | 'drafted' | 'waiting' | 'approved';
+export type RunRow = {
+  agent: 'research' | 'signal' | 'writing' | 'routing';
+  service: ServiceSlug;
+  task: string;
+  result: string;
+  needsApproval: boolean;
+  /** The row's resting state: what reduced motion, no-JS and the end of the loop show. */
+  status: RunStatus;
+};
+
+export const consoleSection = {
+  label: 'the run log',
+  heading: 'ai does the work. people make the calls.',
+  copy:
+    'Named agents research accounts, watch for signals, draft copy and route records, and every step is posted here. Nothing that represents your brand goes out until a person approves it.',
+  points: [
+    { name: 'agents do the work', text: 'Named agents handle research, signals, first drafts and routing.' },
+    { name: 'people approve', text: 'Anything that represents your brand waits for a person to approve it.' },
+    { name: 'everything is logged', text: 'Every step is recorded, so you can see what ran and why.' },
+  ],
+  agents: [
+    { id: 'research', name: 'research agent', role: 'accounts, buyers and context' },
+    { id: 'signal', name: 'signal agent', role: 'watches for buying signals' },
+    { id: 'writing', name: 'writing agent', role: 'drafts copy for review' },
+    { id: 'routing', name: 'routing agent', role: 'records, owners and handoffs' },
+  ],
+  // Short service names for the log's service column.
+  serviceShort: {
+    'gtm-services': 'gtm services',
+    'account-based-marketing': 'abm',
+    'paid-media': 'paid media',
+    'content-engineering': 'content',
+    revops: 'revops',
+  } satisfies Record<ServiceSlug, string>,
+  rows: [
+    { agent: 'research', service: 'gtm-services', task: 'Research Northwind Freight and its sales leadership', result: 'Account record researched', needsApproval: false, status: 'done' },
+    { agent: 'signal', service: 'gtm-services', task: 'Flag Northwind Freight hiring three sales roles', result: 'Signal routed to outbound', needsApproval: false, status: 'done' },
+    { agent: 'writing', service: 'gtm-services', task: 'Draft step 1 email to Dana Reyes', result: 'Draft ready for review', needsApproval: true, status: 'waiting' },
+    { agent: 'research', service: 'account-based-marketing', task: 'Map the buying group at Halcyon Labs', result: '4 buyers identified', needsApproval: false, status: 'done' },
+    { agent: 'routing', service: 'account-based-marketing', task: 'Send Halcyon Labs pricing visits to the AE', result: 'AE assigned', needsApproval: false, status: 'done' },
+    { agent: 'writing', service: 'paid-media', task: 'Write headline B for the ops leaders campaign', result: 'Variant launched after review', needsApproval: true, status: 'approved' },
+    { agent: 'writing', service: 'content-engineering', task: 'Turn the founder interview into a LinkedIn post', result: 'Post drafted in founder voice', needsApproval: true, status: 'drafted' },
+    { agent: 'routing', service: 'revops', task: 'Merge three Jordan Ortiz records into one', result: 'Matching, owner next', needsApproval: false, status: 'running' },
+  ] satisfies RunRow[],
+  approval: { waiting: 'needs approval', approved: 'approved', by: 'your team', action: 'approve' },
+  caption: 'illustrative run log. sample records are fictional.',
+  statusLabels: {
+    running: 'running',
+    done: 'done',
+    drafted: 'drafted',
+    waiting: 'needs approval',
+    approved: 'approved',
+  } satisfies Record<RunStatus, string>,
+};
+
 export const servicesIntro = {
   heading: 'services.',
   copy: 'Five service lines, each made of capabilities you can scope on their own. Pick a line to see the workflow we run.',
