@@ -101,7 +101,9 @@ rgb(11 11 18/.06)`.
 ### Composition plan
 ```
 HERO      | eyebrow · h1 (cols 1-8)          | lede · two CTAs (cols 9-12)
-STORY     | pinned full-width pipeline: chapter caption · 3D model · six-stage scoreboard (scroll = time)
+STORY     | pinned full-width revenue engine: visual title · status · 01-04 caption · 3D engine
+          | (intelligence → 5 parallel channels → pipeline, revops base) · six-column scoreboard
+          | (scroll = focus, the engine runs on its own clock)
 SERVICES  | ─ full width tab bar (5) ───────────────────────────────────────────── |
           | label · h3 · copy · learn more   | workflow canvas (dotted, cards+connectors)    |
           | 01..06 numbered list             |                                                |
@@ -226,3 +228,71 @@ Modes: phones / touch / < 900px autoplay the 13 s loop unpinned (pause in the fo
 cut to accounts / meeting / closed won). Reduced motion: unpinned still frame, chapter 03. Poster
 (no WebGL): unpinned, even six-column scoreboard with the fixed counts. The poster image is now a
 16 : 9 capture at the wide camera.
+
+## Hero v5: the connected revenue engine (2026-11-05)
+
+Brief: the visual has to show the whole GTM system rather than just the leaking pipeline, and it
+keeps the line "strategy + connected execution closes the gaps." v4's message held, but the story
+was about one track only.
+
+```
+Idea:        One machine with three layers and revops underneath. After a short disconnected
+             prelude (five vendors; accounts leak out where each channel ends), it plugs in and
+             runs continuously.
+Signature:   the moment the bus draws under the deck and the status line flips from
+             "before: five vendors, no shared system" to "now: one connected gtm system".
+Screenshot:  chapter 03, accounts moving through the pipeline, a won account's pulse running
+             home along the feedback line, scoreboard 20 / 15 / 10 / 6 / 4 / 2.
+```
+
+The engine, in reading order (geometry in `scene/layout.ts`):
+- A, gtm intelligence: a strategy frame with four instruments (icp & market segmentation, target
+  account selection, buying signals & intent, contact enrichment). It picks the accounts.
+- B, connected execution: five channels side by side (outbound, linkedin, content, paid media,
+  abm). They are parallel lanes, not consecutive stages, and they coordinate with each other.
+- C, sales pipeline: accounts reached → engaged → meetings booked → qualified opps → proposal &
+  negotiation → closed won (the only pink object), with a closed lost branch into a grey tray.
+- revops, the connective tissue rather than a station: a base slab under the whole deck. A charcoal
+  bus runs along its ledge with taps up from every layer, and four plaques sit on it (crm & data
+  integrity, attribution & measurement, pipeline analytics, conversion optimization). A feedback
+  line runs from the outcome trays back to the strategy frame.
+
+Clock and focus:
+- The clock is continuous and starts at 0 the first time the figure is on screen. The prelude
+  (0-6.4 s, `CONNECT`) plays once, then the engine cycles every `LOOP` s. It never wraps back to
+  the prelude.
+- Desktop with a fine pointer (`SCROLL_MQ`): `.story` is 400vh and the pin sticks under the header.
+  Scroll does not scrub time. It moves the focus through four chapters (`floor(progress * 4)`),
+  and the camera leans towards that layer. Phones / touch / < 900px: the focus advances every 6 s
+  after the prelude, with a pause button in the footer. Reduced motion: one still frame at
+  `STILL_T` in chapter 04. No WebGL, Save-Data or low memory: the poster image, chapter 04, and an
+  even six-column scoreboard with the per-cycle counts.
+
+Head (`hero.visual` in site.ts):
+- The visual's title: display 600, h3 scale, balanced.
+- The status line in mono: a hollow square while the system is disconnected, a pink-filled square
+  once it is connected. The text stays ink or muted, never pink.
+- Index 01-04 plus a one-line caption. The old caption exits fast and upwards (0.22 s); the new
+  one enters slower with expo out from below (0.6-0.9 s, 0.16 s delay). Forward always reads as
+  upward travel.
+  - 01 strategy creates direction.
+  - 02 connected execution creates pipeline.
+  - 03 revenue is the outcome.
+  - 04 revops connects every stage, and every outcome sharpens the next decision.
+
+Pills: two tiers.
+- Tier 1, always on: the four layer titles, with an ink outline, a step larger, and a square
+  marker.
+- Tier 2, the focused chapter only: hairline, round muted marker, 0.35 s fade.
+  - Chapter 01: the intel instruments.
+  - Chapter 02: the channels as "name · detail", with the detail dropping below 760px.
+  - Chapter 03: "closed lost · n" (live count) and "engagement signals".
+  - Chapter 04: the revops plaques and "feedback loop".
+- At most ~10 pills are visible at once. No pill appears before its part of the engine is built.
+- Revops plaques and the revops layer pill hang below their anchor (`HANGS`). Everything else sits
+  above its anchor.
+
+Scoreboard: six columns placed at the projected x of each station and closed won. Live counts.
+Station names may wrap to two lines (max 11ch) so columns about 1.25 units apart don't collide at
+1280px. Closed won sits in a pink pill. The v4 "was" strike-through is gone, because the story is
+no longer before/after numbers.

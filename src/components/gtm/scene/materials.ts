@@ -14,6 +14,10 @@ export function createMaterials() {
     sphere: new THREE.MeshStandardMaterial({ color: 0x131318, roughness: 0.42, metalness: 0.05 }),
     pink: new THREE.MeshStandardMaterial({ color: 0xe9a8bc, roughness: 0.6, metalness: 0 }),
     glass: new THREE.MeshStandardMaterial({ color: 0xe8eef0, roughness: 0.08, metalness: 0, transparent: true, opacity: 0.42 }),
+    base: new THREE.MeshStandardMaterial({ color: 0xefecea, roughness: 0.95, metalness: 0 }), // revops ledge, a shade below the deck
+    lost: new THREE.MeshStandardMaterial({ color: 0xb7b2b3, roughness: 0.8, metalness: 0 }), // closed lost: matte grey
+    pulse: new THREE.MeshBasicMaterial({ color: 0xe58fab }), // signals travelling the connectors
+    light: new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.6, metalness: 0 }), // activity pucks (instance colour)
     etch: new THREE.MeshBasicMaterial({ color: 0xdcd7d6 }),
     drain: new THREE.MeshBasicMaterial({ color: 0xe9a8bc, transparent: true }),
     drainCore: new THREE.MeshBasicMaterial({ color: 0x2a2a31, transparent: true }),
@@ -64,7 +68,7 @@ export function gearGeometry(rOuter: number, rRoot: number, teeth: number, depth
 }
 
 /** Rounded puck (a cylinder with a soft top edge), via lathe. */
-export function puckGeometry(r: number, h: number, bevel = 0.03, segments = 40) {
+export function puckGeometry(r: number, h: number, bevel = 0.03, segments = 32) {
   const p = [
     new THREE.Vector2(0, 0), new THREE.Vector2(r, 0), new THREE.Vector2(r, h - bevel),
     new THREE.Vector2(r - bevel * 0.3, h - bevel * 0.3), new THREE.Vector2(r - bevel, h), new THREE.Vector2(0, h),

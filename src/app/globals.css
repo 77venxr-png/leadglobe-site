@@ -272,8 +272,9 @@ html.header-away .header { translate: 0 -100%; }
   .hero__side { max-width: 560px; }
 }
 
-/* Story: the pipeline, full content width. On desktop with a fine pointer the section is a tall
-   track and the stage sticks, so scroll drives the three chapters (GTMHero, SCROLL_MQ). */
+/* Story: the connected revenue engine, full content width. On desktop with a fine pointer the
+   section is a tall track and the stage sticks, so scroll moves the focus through the four
+   chapters (GTMHero, SCROLL_MQ). The engine's own clock never depends on scroll. */
 /* the stage runs nearly edge to edge (gutter only); caption and footer re-align to the content column */
 .story { position: relative; padding: 0 var(--gutter) clamp(3rem, 2rem + 3vw, 5rem); }
 .story__pin { position: relative; }
@@ -282,7 +283,7 @@ html.header-away .header { translate: 0 -100%; }
   mask-image: radial-gradient(70% 45% at 50% 55%, #000 15%, transparent 75%);
 }
 @media (min-width: 900px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-  html.js .story:not(:has(.gtm[data-mode='poster'])) { height: 340vh; padding-bottom: 0; }
+  html.js .story:not(:has(.gtm[data-mode='poster'])) { height: 400vh; padding-bottom: 0; }
   html.js .story:not(:has(.gtm[data-mode='poster'])) .story__pin {
     /* sticks just under the fixed header, so no header-sized gap shows before it pins */
     position: sticky; top: var(--header); height: calc(100svh - var(--header));
@@ -294,25 +295,51 @@ html.header-away .header { translate: 0 -100%; }
   html.js .story:not(:has(.gtm[data-mode='poster'])) .gtm__pause { display: none; }
 }
 
-/* Pipeline figure: 3D model on a plinth, DOM tags projected over the canvas, scoreboard below */
+/* Engine figure: 3D model on a deck over the revops base, DOM pills projected over the canvas,
+   scoreboard below. Head: the visual's title and status line, then chapter index + caption. */
 .gtm { position: relative; margin: 0 auto; max-width: 1840px; container-type: inline-size; display: grid; grid-template-rows: auto auto auto auto; }
 .gtm__head, .gtm__foot { padding-inline: max(0px, calc((100cqi - var(--max)) / 2)); }
-.gtm__head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: baseline; column-gap: 1rem; }
-.gtm__index { font: 500 0.75rem/1 var(--f-mono); letter-spacing: 0.02em; color: var(--c-muted); }
+.gtm__head {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline;
+  column-gap: 1.5rem; row-gap: clamp(0.4rem, 0.2rem + 0.6vh, 0.8rem);
+}
+.gtm__title {
+  font: 600 clamp(1.5rem, 1rem + 1.6vw, 2.6rem)/1.04 var(--f-display); letter-spacing: -0.04em;
+  max-width: 26ch; text-wrap: balance; margin-left: -0.04em; /* optical alignment */
+}
+.gtm__status {
+  justify-self: end; display: inline-flex; align-items: center; gap: 0.55em; white-space: nowrap;
+  font: 500 0.75rem/1 var(--f-mono); letter-spacing: 0.02em; color: var(--c-muted);
+  transition: color 0.4s var(--ease-ui);
+}
+.gtm__status i { width: 7px; height: 7px; border-radius: 1px; border: 1px solid var(--c-line-2); transition: background-color 0.4s var(--ease-ui), border-color 0.4s var(--ease-ui); }
+.gtm__status.is-on { color: var(--c-fg); }
+.gtm__status.is-on i { background: var(--c-pink-deep); border-color: var(--c-pink-deep); }
+.gtm__chapter { grid-column: 1 / -1; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: baseline; column-gap: 1rem; }
+.gtm__index { font: 500 0.75rem/1 var(--f-mono); letter-spacing: 0.02em; color: var(--c-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .gtm__index b { font-weight: 500; color: var(--c-fg); }
 .gtm__chapters { list-style: none; padding: 0; display: grid; }
 .gtm__chapters li {
-  grid-area: 1 / 1; font: 600 clamp(1.35rem, 0.95rem + 1.35vw, 2.35rem)/1.08 var(--f-display); letter-spacing: -0.035em;
-  opacity: 0; translate: 0 0.45em;
-  transition: opacity 0.45s var(--ease-ui), translate 0.6s var(--ease-ui);
+  grid-area: 1 / 1; font: 500 clamp(1rem, 0.85rem + 0.45vw, 1.3rem)/1.25 var(--f-body); letter-spacing: -0.01em; color: var(--c-muted);
+  opacity: 0; translate: 0 -0.3em; text-wrap: balance;
+  /* exit: quick, upward; enter (below): slower expo out from below, after the exit has cleared */
+  transition: opacity 0.22s var(--ease-ui), translate 0.3s var(--ease-ui);
 }
-.gtm__chapters li.is-on { opacity: 1; translate: 0 0; transition-delay: 0.08s; }
+.gtm__chapters li.is-on {
+  opacity: 1; translate: 0 0;
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.16s, translate 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.16s;
+}
+.gtm__chapters li.is-on ~ li { translate: 0 0.45em; } /* later chapters wait below, so forward reads as upward travel */
 .gtm__hint {
   display: none; font: 500 0.75rem/1 var(--f-mono); letter-spacing: 0.02em; color: var(--c-muted);
   transition: opacity 0.4s var(--ease-ui);
 }
 .gtm__hint::after { content: ' \2193'; }
 .gtm:has(.gtm__chapters li:first-child:not(.is-on)) .gtm__hint { opacity: 0; }
+/* the server renders the connected state ("now"); with JS it stays hidden until the clock owns it */
+html:not(.js) .gtm__status { color: var(--c-fg); }
+html:not(.js) .gtm__status i { background: var(--c-pink-deep); border-color: var(--c-pink-deep); }
+html.js .gtm:not([data-mode]) .gtm__status { opacity: 0; }
 html:not(.js) .gtm__chapters li { opacity: 0; }
 html:not(.js) .gtm__chapters li:last-child, .gtm[data-mode='poster'] .gtm__chapters li:last-child { opacity: 1; translate: 0 0; }
 
@@ -336,9 +363,17 @@ html:not(.js) .gtm__poster, .gtm[data-mode='poster'] .gtm__poster { display: blo
   background: var(--c-fg); vertical-align: 1px;
 }
 .gtm__tag.is-shown { opacity: 1; }
-.gtm__tag.is-active { background: var(--c-fg); border-color: var(--c-fg); color: #fff; }
-.gtm__tag.is-active::before { background: var(--c-pink-deep); }
-.gtm__short { display: none; }
+/* tier 1: the four layer titles, always on: ink outline, a step larger, square ink marker */
+.gtm__tag--layer {
+  font-size: 0.8125rem; padding: 0.5rem 0.8rem; color: var(--c-fg);
+  background: rgb(255 255 255 / 0.97); border-color: var(--c-fg); z-index: 1;
+}
+/* tier 2: details for the focused chapter only, quieter: hairline, round muted marker */
+.gtm__tag--detail { color: var(--c-fg); }
+.gtm__tag--detail::before { width: 5px; height: 5px; border-radius: 50%; background: var(--c-muted); }
+.gtm__tagd { color: var(--c-muted); }
+.gtm__tagn { font-weight: 500; font-variant-numeric: tabular-nums; }
+@media (prefers-reduced-motion: reduce) { .gtm__tag { transition: none; } }
 
 /* Scoreboard: one column under each stage (JS aligns them to the stages' screen x) */
 .gtm__score { list-style: none; padding: 0; display: grid; padding-top: clamp(0.5rem, 0.2rem + 1vh, 1rem); }
@@ -346,19 +381,16 @@ html:not(.js) .gtm__poster, .gtm[data-mode='poster'] .gtm__poster { display: blo
   grid-area: 1 / 1; justify-self: start; will-change: transform;
   display: grid; justify-items: center; gap: 0.45rem;
 }
-.gtm__nums { display: flex; align-items: baseline; gap: 0.35em; }
 .gtm__n {
-  font: 600 clamp(1.75rem, 0.9rem + 2.1vw, 3.25rem)/0.9 var(--f-display); letter-spacing: -0.045em;
+  font: 600 clamp(1.6rem, 0.85rem + 1.8vw, 2.9rem)/0.9 var(--f-display); letter-spacing: -0.045em;
   font-variant-numeric: tabular-nums;
 }
-.gtm__was {
-  display: none; font: 500 clamp(0.9rem, 0.65rem + 0.55vw, 1.25rem)/1 var(--f-mono); color: var(--c-muted);
-  text-decoration-thickness: 1.5px; text-decoration-color: var(--c-pink-deep);
+/* stations sit ~1.25 units apart: names may wrap to two lines so neighbours never collide */
+.gtm__stagename {
+  font: 500 0.6875rem/1.25 var(--f-mono); letter-spacing: 0.02em; color: var(--c-muted);
+  max-width: 11ch; text-align: center; text-wrap: balance;
 }
-.gtm.is-fixed .gtm__was, html:not(.js) .gtm__was, .gtm[data-mode='poster'] .gtm__was { display: inline; }
-.gtm__score li:first-child .gtm__was { display: none; } /* the market size never changes */
-.gtm__stagename { font: 500 0.75rem/1 var(--f-mono); letter-spacing: 0.02em; color: var(--c-muted); white-space: nowrap; }
-.gtm__score li.is-won .gtm__stagename { color: var(--c-fg); background: var(--c-pink); padding: 0.35rem 0.6rem; border-radius: 999px; margin-top: -0.35rem; }
+.gtm__score li.is-won .gtm__stagename { color: var(--c-fg); background: var(--c-pink); padding: 0.35rem 0.6rem; border-radius: 999px; margin-top: -0.35rem; max-width: none; white-space: nowrap; }
 /* without the 3D model there are no stage positions: an even row */
 html:not(.js) .gtm__score, .gtm[data-mode='poster'] .gtm__score { grid-template-columns: repeat(6, minmax(0, 1fr)); }
 html:not(.js) .gtm__score li, .gtm[data-mode='poster'] .gtm__score li { grid-area: auto; justify-self: center; transform: none !important; }
@@ -380,10 +412,12 @@ html:not(.js) .gtm__progress, .gtm[data-mode='poster'] .gtm__progress { display:
 .gtm:not([data-mode='gl']) .gtm__pause { visibility: hidden; }
 
 @container (max-width: 760px) {
-  .gtm__head { grid-template-columns: auto minmax(0, 1fr); }
+  .gtm__head { grid-template-columns: minmax(0, 1fr); }
+  .gtm__status { justify-self: start; grid-row: 2; }
+  .gtm__chapter { grid-template-columns: auto minmax(0, 1fr); }
   .gtm__tag { font-size: 0.625rem; padding: 0.3rem 0.45rem; }
-  .gtm__long { display: none; }
-  .gtm__short { display: inline; }
+  .gtm__tag--layer { font-size: 0.6875rem; padding: 0.35rem 0.55rem; }
+  .gtm__tagd { display: none; } /* channel detail drops on narrow stages; the name stays */
 }
 @container (max-width: 600px) {
   .gtm__stage { aspect-ratio: 1 / 0.95; }
@@ -391,8 +425,6 @@ html:not(.js) .gtm__progress, .gtm[data-mode='poster'] .gtm__progress { display:
   .gtm__score, html:not(.js) .gtm__score, .gtm[data-mode='poster'] .gtm__score { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .gtm__score li { grid-area: auto; justify-self: center; transform: none !important; }
   .gtm__score li:nth-child(2), .gtm__score li:nth-child(3), .gtm__score li:nth-child(5) { display: none; }
-  .gtm__score .gtm__long { display: inline; }
-  .gtm__score .gtm__short { display: none; }
 }
 
 

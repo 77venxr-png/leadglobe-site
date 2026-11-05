@@ -57,12 +57,24 @@ export const hero = {
   headline: 'strategy + connected execution to fix your pipeline leakage.',
   copy:
     'We set your go-to-market strategy, then run outbound, ABM, paid media, content and RevOps as one connected system, so qualified buyers stop slipping through the gaps between teams and tools.',
-  // The three chapters of the hero pipeline (scroll drives them on desktop).
-  chapters: [
-    'prospects leak at every handoff.',
-    'strategy + connected execution closes the gaps.',
-    'the right accounts reach closed won.',
-  ],
+  // The connected revenue engine under the hero. Scroll (desktop) or a timer (phones) moves the
+  // focus through four chapters; the engine itself runs continuously. Labels stay lowercase.
+  visual: {
+    title: 'strategy + connected execution closes the gaps.',
+    chapters: [
+      'strategy creates direction.',
+      'connected execution creates pipeline.',
+      'revenue is the outcome.',
+      'revops connects every stage, and every outcome sharpens the next decision.',
+    ],
+    status: { before: 'before: five vendors, no shared system', after: 'now: one connected gtm system' },
+    layers: ['gtm intelligence', 'connected execution', 'sales pipeline', 'revops'],
+    intel: ['icp & market segmentation', 'target account selection', 'buying signals & intent', 'contact enrichment'],
+    revops: ['crm & data integrity', 'attribution & measurement', 'pipeline analytics', 'conversion optimization'],
+    feedback: 'feedback loop',
+    intake: 'engagement signals',
+    lost: 'closed lost',
+  },
 };
 
 export const servicesIntro = {

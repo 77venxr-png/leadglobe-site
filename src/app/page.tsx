@@ -29,7 +29,7 @@ export default function Home() {
       </section>
 
       {/* The pipeline story. Desktop: a tall track with a sticky stage, scroll drives the chapters. */}
-      <section className="story" aria-label="how leakage gets fixed">
+      <section className="story" aria-label="how the connected revenue engine works">
         <div className="story__pin" data-reveal="fade" data-intro data-delay="0.15">
           <GTMHero />
         </div>

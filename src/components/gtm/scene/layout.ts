@@ -1,54 +1,39 @@
-// Shared geometry of the sales-pipeline model. Pure data: no three.js objects, no time.
-// Pipeline space: the track runs along +x at z = 0 (market on the left, closed won on the right);
-// service modules dock behind it (âˆ’z). The scene rotates the whole model by a yaw so the won end
-// comes towards the camera.
-
-export const CYCLE = 13; // seconds per loop
-// Yaw and camera elevation follow the frame's aspect: a wide frame (the pinned desktop panorama)
-// shows the track almost left to right; a squarer frame (phones) turns it diagonal to fit.
-export const YAW_WIDE = -0.3; // radians, at aspect >= 2.2
-export const YAW_SQUARE = -0.74; // at aspect <= 1.1: market far left, closed won near right
-export const EL_WIDE = 42; // degrees
-export const EL_SQUARE = 50;
-
-export const CH_Y = 0.34; // track centre height
-export const CH_R = 0.04; // track rail radius
-export const SPHERE_R = 0.1;
-export const SY = CH_Y + 0.105; // sphere centre height riding the twin rails
-export const GAP_HALF = 0.28; // half width of a leaking handoff
+// Shared geometry and timing of the connected revenue engine. Pure data: no three.js objects.
+// Model space: x runs left → right (intelligence → channels → pipeline), z towards the camera,
+// y up with the deck top at 0. The scene turns the whole model by an aspect-dependent yaw.
+//
+//   A  gtm intelligence   market tray + strategy frame, then select · signal · enrich on a feed track
+//   B  connected execution five parallel lanes (stacked in z), one channel module each, cross-links,
+//                          a manifold that merges them into one intake
+//   C  sales pipeline      six stations, side chutes for dropouts, a closed-lost branch, closed won
+//   R  revops              a lower front ledge with the data bus, taps from every layer, four
+//                          instruments; a feedback line along the back edge returns to the strategy
 
 export type Vec = [number, number, number];
 
-/** Pipeline stages (gates). The last one is the closed-won tray, not a gate. */
-export const stages = [
-  { id: 'accounts', name: 'accounts', x: -4.8 },
-  { id: 'contacted', name: 'contacted', x: -2.85 },
-  { id: 'replied', name: 'replied', x: -0.9 },
-  { id: 'meeting', name: 'meeting', x: 1.05 },
-  { id: 'opportunity', name: 'opportunity', x: 3.0 },
-  { id: 'won', name: 'closed won', x: 5.0 },
-] as const;
+// Yaw and camera elevation follow the frame's aspect: a wide frame (the pinned desktop panorama)
+// shows the engine almost left to right; a squarer frame (phones) turns it diagonal to fit.
+export const YAW_WIDE = -0.26; // radians, at aspect >= 2.2
+export const YAW_SQUARE = -0.7; // at aspect <= 1.1
+export const EL_WIDE = 44; // degrees
+export const EL_SQUARE = 52;
 
-/** Handoffs between consecutive stages: where the siloed pipeline leaks, and where a service docks. */
-export const handoffs = stages.slice(0, -1).map((s, i) => ({ x: (s.x + stages[i + 1].x) / 2 }));
+// ------------------------------------------------------------------ plinth
+/** Upper deck carries A, B and C. Its top is y = 0. */
+export const DECK = { x0: -9.0, x1: 8.1, z0: -2.55, z1: 2.3, h: 0.26, r: 0.5 };
+/** Lower base slab under the deck, reaching out at the front: the revops ledge. */
+export const BASE = { x0: -9.15, x1: 8.25, z0: -2.4, z1: 3.15, h: 0.2, r: 0.55 };
+export const LEDGE_Y = -DECK.h; // top of the base slab
+export const BUS_Z = 2.72;
+export const BUS_Y = LEDGE_Y + 0.07;
 
-/** The service that fixes each handoff (same order as handoffs). */
-export const services = [
-  { id: 'outbound', name: 'outbound' },
-  { id: 'paid', name: 'paid media' },
-  { id: 'content', name: 'content' },
-  { id: 'abm', name: 'abm' },
-  { id: 'revops', name: 'revops' },
-] as const;
-export type ServiceId = (typeof services)[number]['id'];
-export const MODULE_Z = -1.05;
+// ------------------------------------------------------------------ track
+export const CH_Y = 0.34; // rail height
+export const SPHERE_R = 0.1;
+export const SY = CH_Y + 0.105; // token centre riding the twin rails
 
-export const TRACK_START = -5.15;
-export const TRACK_END = 4.75;
-export const TRAY: Vec = [5.55, 0, 0];
-
-/** The market: a 5 Ã— 7 grid of prospect accounts on a tray at the left. */
-export const MARKET = { x: -6.45, z: -0.15, cols: 5, rows: 7, gap: 0.34, y: 0.24 };
+// A: intelligence
+export const MARKET = { x: -7.6, z: -0.15, cols: 6, rows: 5, gap: 0.34, y: 0.24 };
 export const marketSlots: Vec[] = (() => {
   const s: Vec[] = [];
   for (let c = 0; c < MARKET.cols; c++) for (let r = 0; r < MARKET.rows; r++) {
@@ -56,41 +41,90 @@ export const marketSlots: Vec[] = (() => {
   }
   return s;
 })();
+export const FRAME = { w: MARKET.cols * MARKET.gap + 0.5, d: MARKET.rows * MARKET.gap + 0.5, y: 0.62 };
+export const FEED_X0 = -6.4; // where the feed track leaves the market
+export const SELECT_X = -6.0;
+export const SIGNAL_X = -5.2;
+export const ENRICH_X = -4.4;
+export const SPLIT_X = -3.9; // the splitter fans out from here
 
-/** Spine of the connected engine (behind the modules) and its hub. */
-export const SPINE_Z = -1.75;
-export const HUB: Vec = [-0.4, 0, -2.05];
-export const STRATEGY: Vec = [MARKET.x, 0, MARKET.z];
+// B: channels (parallel lanes, stacked in z)
+export const LANE_X0 = -3.4;
+export const LANE_X1 = -0.9;
+export const MODULE_X = -2.15;
+export const LANE_Z = [-1.6, -0.8, 0, 0.8, 1.6];
+export const MODULE_DZ = -0.36; // module sits just behind its lane
+export const channels = [
+  { id: 'outbound', name: 'outbound', detail: 'sequences · follow-ups' },
+  { id: 'linkedin', name: 'linkedin', detail: 'social selling' },
+  { id: 'content', name: 'content', detail: 'thought leadership' },
+  { id: 'paid', name: 'paid media', detail: 'account-level reach' },
+  { id: 'abm', name: 'abm', detail: 'buying committees' },
+] as const;
+export type ChannelId = (typeof channels)[number]['id'];
+/** Cross-links between lanes: coordination. abm also reaches linkedin. */
+export const LINKS: [number, number][] = [[0, 1], [1, 2], [2, 3], [3, 4], [4, 1]];
+export const DRAIN_X = -0.72; // prelude: lanes end in drains here
+export const INTAKE_X = 0.2;
 
-/** Plinth: a rounded slab under everything. */
-export const PLINTH = { x0: -7.55, x1: 6.55, z0: -2.8, z1: 1.05, h: 0.26, r: 0.55 };
+// C: pipeline
+export const stations = [
+  { id: 'reached', name: 'accounts reached', x: 0.8 },
+  { id: 'engaged', name: 'accounts engaged', x: 2.05 },
+  { id: 'meetings', name: 'meetings booked', x: 3.3 },
+  { id: 'qualified', name: 'qualified opps', x: 4.55 },
+  { id: 'proposal', name: 'proposal & negotiation', x: 5.8 },
+] as const;
+export const WON = { x: 7.3, z: 0, name: 'closed won' };
+export const LOST = { x: 6.8, z: 1.55, name: 'closed lost' };
+export const TRACK_END = 6.75;
+export const LOST_BRANCH_X = 6.15;
+export const CHUTE_DX = 0.45; // dropout chutes leave the track just after their station
+export const N_STAGES = stations.length + 1; // + closed won (the scoreboard columns)
 
-/** Resting places in the closed-won tray (3 Ã— 3). */
-export const traySlots: Vec[] = Array.from({ length: 9 }, (_, i) => [
-  TRAY[0] + ((i % 3) - 1) * 0.27, 0.24, TRAY[2] + (Math.floor(i / 3) - 1) * 0.27,
-]);
-
-// ------------------------------------------------------------------------------- runs
-
-/** fate: index of the handoff where the sphere leaks, or 5 = closed won. */
-export type SphereSpec = { run: 0 | 1; slot: number; spawn: number; speed: number; fate: number; tray?: number };
-
-// Run 0 (no strategy, disconnected): 16 random accounts, 6/4/3/2/1 leak, none closes.
-const LEAK0 = [0, 1, 0, 2, 0, 1, 3, 0, 2, 1, 0, 4, 1, 2, 3, 0]; // fate per sphere, mixed order
-const SLOTS0 = [2, 30, 9, 21, 33, 14, 5, 26, 11, 17, 0, 23, 32, 7, 28, 19];
-// Run 1 (strategy picks the fit accounts, every handoff bridged): 1/2/1/2/1 leak, 9 close.
-// Winners go first so the tray fills while the late ones leak early.
-const FATE1 = [5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 1, 2, 1, 3, 4, 3];
-const SLOTS1 = [8, 15, 22, 29, 10, 16, 24, 3, 18, 31, 1, 12, 25, 6, 20, 27];
-
-export const RUN1_AT = 6.3; // when the connected run starts (counts switch over)
-
-export const sphereSpecs: SphereSpec[] = [
-  ...LEAK0.map((fate, i) => ({ run: 0 as const, slot: SLOTS0[i], spawn: 0.55 + i * 0.16, speed: 3.6, fate })),
-  ...FATE1.map((fate, i) => ({ run: 1 as const, slot: SLOTS1[i], spawn: RUN1_AT + 0.25 + i * 0.15, speed: 4.1, fate, tray: fate === 5 ? i : undefined })),
+/** Feedback line: from the lost tray, round the right edge, along the back, up to the strategy frame. */
+export const FEEDBACK_X = 7.9;
+export const FEEDBACK_Z = -2.3;
+export const feedbackPath: Vec[] = [
+  [LOST.x + 0.45, 0.1, LOST.z], [FEEDBACK_X, 0.1, LOST.z], [FEEDBACK_X, 0.1, WON.z], [FEEDBACK_X, 0.1, FEEDBACK_Z + 0.25],
+  [FEEDBACK_X - 0.25, 0.1, FEEDBACK_Z], [MARKET.x + 0.3, 0.1, FEEDBACK_Z], [MARKET.x + 0.05, 0.1, FEEDBACK_Z + 0.2],
+  [MARKET.x, FRAME.y * 0.6, MARKET.z - FRAME.d / 2 - 0.02], [MARKET.x, FRAME.y, MARKET.z - FRAME.d / 2],
 ];
+/** Where on the feedback line each origin joins (fraction of its length, measured in the scene). */
+export const TAP_XS = [ENRICH_X, MODULE_X, ...stations.map((s) => s.x), WON.x]; // revops taps
 
-/** Final per-stage counts of the leaking run (what "was" shows during the connected run). */
-export const wasCounts = stages.map((_, g) => LEAK0.filter((f) => f >= g).length);
-/** Final per-stage counts of the connected run (server render, no-JS and poster fallback). */
-export const fixedCounts = stages.map((_, g) => FATE1.filter((f) => f >= g).length);
+// ------------------------------------------------------------------ timing
+export const SPEED = 1.5; // units per second on the track (connected run)
+export const PRELUDE_SPEED = 2.2;
+export const CONNECT = 6.4; // first connected spawn; the system has plugged in by now
+export const LOOP = 18; // seconds per connected cycle
+export const LIFE = LOOP - 0.6; // a token's instance never outlives its cycle (no pops)
+export const FB_DUR = 3.2; // feedback pulse travel time
+
+/** Stop kinds a token dwells at (seconds). */
+export const DWELL = { select: 0.3, signal: 0.3, enrich: 0.4, module: 0.5, station: 0.35 };
+
+/**
+ * Fate: index of the last station reached. 0–3 drop out after that station (side chute to the
+ * revops ledge), 4 = closed lost (after proposal), 5 = closed won.
+ * Per cycle: reached 20 → engaged 15 → meetings 10 → qualified 6 → proposal 4 → won 2 / lost 2.
+ */
+export type TokenSpec = { slot: number; lane: number; fate: number; spawn: number };
+const FATES = [0, 2, 5, 1, 0, 3, 1, 2, 4, 0, 1, 2, 5, 0, 1, 3, 2, 4, 0, 1];
+const LANES = [0, 1, 2, 3, 4, 2, 0, 4, 1, 3, 3, 0, 4, 1, 2, 1, 3, 2, 0, 4];
+const SLOTS = [12, 3, 17, 26, 8, 21, 14, 0, 28, 10, 6, 19, 24, 2, 15, 29, 9, 22, 5, 13];
+export const tokenSpecs: TokenSpec[] = FATES.map((fate, i) => ({ slot: SLOTS[i], lane: LANES[i], fate, spawn: i * 0.85 }));
+
+/** Prelude (disconnected): a few accounts, no selection, they reach the channels and leak out. */
+const PRE_SLOTS = [1, 7, 11, 16, 20, 23, 25, 27];
+export const preludeSpecs = PRE_SLOTS.map((slot, i) => ({ slot, lane: [2, 0, 3, 1, 4, 2, 0, 3][i], spawn: 0.3 + i * 0.25 }));
+
+/** Final per-cycle counts (server render, no-JS and poster fallback). Stations then won. */
+export const cycleCounts = [
+  ...stations.map((_, k) => FATES.filter((f) => f >= k).length),
+  FATES.filter((f) => f === 5).length,
+];
+export const lostPerCycle = FATES.filter((f) => f === 4).length;
+
+/** Layer centres (x) the camera leans towards when a chapter has focus. 3 = whole engine. */
+export const FOCUS_X = [-6.2, -2.2, 3.8, 0];
