@@ -8,8 +8,8 @@ The director updates this file after every stage. Read it first in any new sessi
 | Stage | Role(s) | Scope | Status |
 |---|---|---|---|
 | 0 | director | research report, studio setup | done |
-| 1 | design-system-steward | type and spacing tokens in `:root`; remove pink used as text; drop `--c-pink-2`; DESIGN.md System section | in progress (`wip/s1-tokens`) |
-| 2 | editorial-typographer | site-wide type migration onto the new tokens; mono audit (35 → ≤10); remove eyebrows except the hero's; drop noun-heading full stops | next |
+| 1 | design-system-steward | type and spacing tokens in `:root`; remove pink used as text; drop `--c-pink-2`; DESIGN.md System section | done (322c9a2 → integrated) |
+| 2 | editorial-typographer | site-wide type migration onto the new tokens; mono audit (35 → ≤10); remove eyebrows except the hero's; drop noun-heading full stops | in progress (`wip/s2-type`) |
 | 3 | frontend-engineer → motion-director | the proof: replace `AgentConsole.tsx` with Dana's annotated email and the human edit; pin ≤200vh | queued |
 | 4 | webgl-engineer (+ frontend-engineer) | engine head, leader-line labels, new scoreboard; regenerate the poster; story and camera unchanged | queued |
 | 5 | frontend-engineer + motion-director | services index, about, engagement, faq, contact, service-page lists | queued |
