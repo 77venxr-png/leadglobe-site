@@ -1,0 +1,1 @@
+source: https://github.com/addyosmani/web-quality-skills (skills/core-web-vitals) @ afa8da9. Vendored markdown only; scripts not copied.

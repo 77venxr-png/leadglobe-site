@@ -1,0 +1,1 @@
+source: https://github.com/emilkowalski/skills (skills/animation-performance) @ c8a7962. Vendored markdown only; scripts not copied.

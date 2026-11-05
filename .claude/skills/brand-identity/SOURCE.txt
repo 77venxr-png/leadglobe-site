@@ -1,0 +1,1 @@
+source: https://github.com/fatihaydost/brand-identity-skill (skills/brand-identity) @ 3ba008e. Vendored markdown only; scripts not copied.

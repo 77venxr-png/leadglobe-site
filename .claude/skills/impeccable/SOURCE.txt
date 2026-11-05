@@ -1,0 +1,1 @@
+source: https://github.com/pbakaus/impeccable (.claude/skills/impeccable) @ c8891a9. Vendored markdown only; scripts not copied.

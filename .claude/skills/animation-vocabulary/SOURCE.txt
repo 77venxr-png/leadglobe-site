@@ -1,0 +1,1 @@
+source: https://github.com/emilkowalski/skills (skills/animation-vocabulary) @ c8a7962. Vendored markdown only; scripts not copied.

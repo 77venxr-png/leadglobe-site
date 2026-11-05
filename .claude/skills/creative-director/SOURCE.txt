@@ -1,0 +1,1 @@
+source: https://github.com/smixs/creative-director-skill (creative-director) @ ac06eb2. Vendored markdown only; scripts not copied.

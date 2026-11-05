@@ -1,0 +1,1 @@
+source: https://github.com/akillness/jeo-skills (.agent-skills/responsive-design) @ 1150817. Vendored markdown only; scripts not copied.

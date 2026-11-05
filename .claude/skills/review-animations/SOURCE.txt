@@ -1,0 +1,1 @@
+source: https://github.com/emilkowalski/skills (skills/review-animations) @ c8a7962. Vendored markdown only; scripts not copied.

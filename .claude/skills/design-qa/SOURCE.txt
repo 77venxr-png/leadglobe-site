@@ -1,0 +1,1 @@
+source: https://github.com/plugin87/ux-ui-agent-skills (.claude/skills/design-qa) @ def84a7. Vendored markdown only; scripts not copied.

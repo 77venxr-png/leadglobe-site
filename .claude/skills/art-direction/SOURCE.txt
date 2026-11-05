@@ -1,0 +1,1 @@
+source: https://github.com/rampstackco/claude-skills (skills/art-direction) @ 9b90db2. Vendored markdown only; scripts not copied.

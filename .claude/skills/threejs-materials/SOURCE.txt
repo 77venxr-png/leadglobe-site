@@ -1,0 +1,1 @@
+source: https://github.com/CloudAI-X/threejs-skills (skills/threejs-materials) @ 0e18186. Vendored markdown only; scripts not copied.

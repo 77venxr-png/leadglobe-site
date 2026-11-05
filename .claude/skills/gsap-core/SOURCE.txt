@@ -1,0 +1,1 @@
+source: https://github.com/greensock/gsap-skills (skills/gsap-core) @ aed9cfd. Vendored markdown only; scripts not copied.
