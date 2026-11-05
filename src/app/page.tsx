@@ -2,9 +2,8 @@ import { AgentConsole } from '@/components/AgentConsole';
 import { Button } from '@/components/Button';
 import { ContactForm } from '@/components/ContactForm';
 import { GTMHero } from '@/components/gtm/GTMHero';
-import { Route } from '@/components/Route';
 import { ServiceTabs } from '@/components/ServiceTabs';
-import { about, consoleSection, contactHref, engagement, faq, finalCta, hero, howItWorks, principles, servicesIntro, site } from '@/data/site';
+import { about, consoleSection, contactHref, engagement, faq, finalCta, hero, principles, servicesIntro, site } from '@/data/site';
 
 const faqLd = {
   '@context': 'https://schema.org',
@@ -59,12 +58,6 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="how-it-works" className="section section--how" aria-labelledby="how-title">
-        <div className="section__head">
-          <h2 id="how-title" className="h2" data-split="lines">{howItWorks.heading}</h2>
-        </div>
-        <Route />
-      </section>
 
       <section id="about" className="section section--dark" aria-labelledby="about-title">
         <div className="about">

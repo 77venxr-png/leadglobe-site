@@ -56,7 +56,7 @@ export const mailHref = `mailto:${site.email}?subject=${encodeURIComponent(site.
 
 export const nav = [
   { label: 'services', href: '/#services' },
-  { label: 'how it works', href: '/#how-it-works' },
+  { label: 'how it works', href: '/#console' },
   { label: 'about', href: '/#about' },
 ];
 
@@ -324,17 +324,6 @@ export const services: Service[] = [
   },
 ];
 
-export const howItWorks = {
-  heading: 'how it works.',
-  steps: [
-    { name: 'discover', title: 'Discover', text: 'Understand your goals and current setup.' },
-    { name: 'define', title: 'Define', text: 'Agree on scope, deliverables, and success measures.' },
-    { name: 'build', title: 'Build', text: 'Configure the campaigns, systems, and workflows.' },
-    { name: 'execute', title: 'Execute', text: 'Launch, operate, and manage the work.' },
-    { name: 'improve', title: 'Improve', text: 'Measure results and refine execution.' },
-  ],
-};
-
 export const principles = {
   heading: 'how we work.',
   items: [
@@ -362,6 +351,11 @@ export const faq = {
       q: 'Which services does leadglobe offer?',
       a: 'Five areas: GTM services (outbound, research, signals and sales handoff), account-based marketing, paid media, content engineering and RevOps. Each area is a set of capabilities that can be scoped individually.',
     },
+    // OWNER TO CONFIRM: same operating-model claim as consoleSection.
+    {
+      q: 'How does leadglobe use AI?',
+      a: 'Named AI agents do the groundwork: account and buyer research, watching for buying signals, first drafts and CRM routing. People set the strategy and make the calls, and anything that represents your brand is approved by your team before it goes out.',
+    },
     {
       q: 'Do we have to buy all five services?',
       a: 'No. Most engagements start with one area or a few capabilities within it. We scope the work to what you need and add to it only if it makes sense.',
@@ -386,8 +380,8 @@ export const faq = {
 };
 
 export const finalCta = {
-  heading: "let's put your gtm plans into action.",
-  copy: "Tell us what you need to build or improve. We'll discuss the right scope of work.",
+  heading: 'let’s put your gtm plans into action.',
+  copy: 'Tell us what you need to build or improve. We’ll discuss the right scope of work.',
 };
 
 export const about = {
