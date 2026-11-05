@@ -52,38 +52,76 @@ Screenshot:  the services panel: black tab, numbered list, workflow with a pink 
 
 ## System
 
-### Palette (white / black / light pink)
-| Role | Hex | Use |
-|---|---|---|
-| ground | `#FFFFFF` | page |
-| ground-2 | `#FAF8F9` | alternating sections, dotted fields |
-| ink | `#0B0B12` | text, active tab, dark result cards (logo ink) |
-| muted | `#5D5D69` | supporting copy (7.0:1 on white) |
-| line | `rgb(11 11 18 / 0.10)` | hairlines, card borders |
-| pink | `#F7D6E0` | the accent: signal, badges, highlights, CTA fill. Always with ink text |
-| pink-deep | `#E9A8BC` | connector nodes, signal core (graphics only, never text) |
-| curtain | ink | page transition |
+Every colour, radius, shadow, duration and type size comes from a `:root` token in
+`src/app/globals.css`. This section mirrors those tokens; change both together.
 
-No blue, no gradient. Pink never carries text colour, only fills.
+### Grammar (concept v6, "the proof")
+- **mono = machine, Geist display = person.** Geist Mono is only for what a machine wrote or
+  measured: agent notes, counts, positions, status, captions. It is small, there are many of
+  them, and they sit in the margin. Geist display is the person's voice: big, and few per page.
+- **pink = the person's highlighter, fill only.** Pink marks where a person acted: the
+  highlight band, closed won, the contact field, `::selection`, hover fills. It is a fill or a
+  graphic (stroke, node, ring, dot), **never a text colour**, on any ground. Text on pink is ink.
+- **ink rule = the decision.** Hairlines replace cards.
+
+### Palette (white / black / light pink)
+| Token | Hex | Use |
+|---|---|---|
+| `--c-bg` | `#FFFFFF` | page ground; also text on ink fields |
+| `--c-bg-2` | `#FAF8F9` | alternating sections, dotted fields, quiet hover tint |
+| `--c-fg` | `#0B0B12` | text, active tab, dark result cards (logo ink) |
+| `--c-muted` | `#5D5D69` | secondary text on white (6.5:1) |
+| `--c-muted-ink` | `#B4B4C2` | secondary text on ink (9.6:1): numerals, labels, captions on dark |
+| `--c-line` / `--c-line-2` | `rgb(11 11 18 / .10)` / `/ .18` | hairlines, field outlines |
+| `--c-pink` | `#F7D6E0` | the highlighter: fill only (bands, closed won, contact, selection, rings) |
+| `--c-pink-deep` | `#E9A8BC` | graphics only: signal, connector nodes, markers, strokes |
+| `--c-curtain` | ink | page transition |
+
+No blue, no violet, no gradient. Pink never carries text colour: where an element on ink used
+to turn pink, it now uses `--c-muted-ink` (secondary marks) or white (primary text).
+`--c-pink-2` (`#FCEDF2`) is retired; its three fills now use `--c-bg-2`.
 
 ### Type
-- **Geist** (the wordmark's family) via `next/font/google`. Display 600, tracking -0.035em to
-  -0.02em by size; body 400 at 17px / 1.55.
-- **Geist Mono** 500 for labels and workflow annotations at 11.5 to 12px, tracking 0.02em.
+- **Geist** (the wordmark's family) via `next/font/google`, display 600. Body 400 at
+  `--t-body` (17px) / 1.55; reading text (proof body, ledes) at `--t-read` / 1.5.
+- **Geist Mono** 500 at `--t-mono` (12px), the only mono size, tracking 0.02em.
 - **Lowercase** for display headings, nav, tabs, buttons and labels (matches the wordmark).
-  Body copy and sample data in the workflow UIs stay in normal case for legibility. "gtm" is
-  written lowercase in headings, "GTM" in body copy.
-- Scale: hero t-xl clamp(2.6rem → 5.4rem), h2 clamp(2rem → 3.4rem), h3 1.5 to 2rem.
+  Body copy and sample data stay in sentence case. "gtm" lowercase in headings, "GTM" in body.
+- Full stops on sentences only, never on noun headings.
+
+Scale (fluid `clamp()`, px at a 1440px viewport):
+
+| Token | Value | @1440 | Tracking / leading | Use |
+|---|---|---|---|---|
+| `--t-mega` | `clamp(3.75rem, 0.5rem + 13vw, 13.5rem)` | 195 | `--tr-mega` -0.06em / `--lh-mega` 0.86 | once per page |
+| `--t-display` | `clamp(2.75rem, 0.5rem + 6.67vw, 7rem)` | 104 | `--tr-display` -0.05em / `--lh-display` 0.92 | h1, about, contact |
+| `--t-l` | `clamp(2.25rem, 1.2rem + 3.6vw, 4.75rem)` | 71 | `--tr-l` -0.04em / `--lh-l` 0.96 | h2, stage names, closed won |
+| `--t-index` | `clamp(1.75rem, 1rem + 2.6vw, 3.25rem)` | 53 | `--tr-index` -0.03em / `--lh-index` 1.05 | lists that are the content |
+| `--t-h3` | `clamp(1.6rem, 1.25rem + 1.3vw, 2.35rem)` | 37.6 | `--tr-h3` -0.03em / `--lh-h3` 1.05 | captions, run-in heads |
+| `--t-read` | `clamp(1.125rem, 0.95rem + 0.55vw, 1.5rem)` | 23 (24 from 1600) | 1.5 | proof body, ledes |
+| `--t-body` | `1.0625rem` | 17 | 1.55 | body |
+| `--t-mono` | `0.75rem` | 12 | 0.02em | machine voice |
+
+Mega over body is 11.5:1, so the page always has one loudest thing. `--t-display` follows
+director's amendment 3 (about 104px rather than the concept's 119px, so the hero lede stays in
+the 1440x900 fold); the editorial-typographer tunes the h1 from there.
+Legacy, migrating in stage 2: `--t-xl`, `--t-m`, `--t-s` (15px), `--t-xs` (12px).
 
 ### Grid and rhythm
-12 columns, fluid gutter, 1320px max content width. Hang text from column 1 and column 7.
-Section moods: hero (airy), services (tight, framed), how it works (normal), principles
-(normal, dark), engagement (tight), FAQ (normal), CTA (airy), footer.
+12 columns, `--gutter` fluid gutter, `--max` 1320px content width. Hang text from column 1 and
+column 7. Three section densities:
+
+| Token | Value | @1440 | Sections |
+|---|---|---|---|
+| `--space-breathe` | `clamp(8rem, 4rem + 12vw, 16rem)` | 237 | hero, the proof, contact |
+| `--space-section` | `clamp(5rem, 3rem + 6vw, 9rem)` | 134 | default |
+| `--space-tight` | `clamp(3rem, 2rem + 3vw, 5rem)` | 75 | faq, about |
 
 ### Shape
-One radius rule: 14px for cards, 999px for chips and buttons, 3px for connector nodes
-(square nodes per brief). Shadows: one soft level `0 1px 2px rgb(11 11 18/.04), 0 8px 24px
-rgb(11 11 18/.06)`.
+Radii: `--r-card` 14px (cards, tab bar, orbit nodes), `--r-panel` 20px (panels), 999px for
+chips and buttons (not yet a token), 3px for square connector nodes. One shadow level, `--shadow`:
+`0 1px 2px rgb(11 11 18/.04), 0 8px 24px rgb(11 11 18/.06)`. The proof's grammar replaces most
+cards and capsules with hairlines in later stages.
 
 ### Motion language
 - Eases from the engine: `out` for entrances, `soft` for UI, `inOut` for the curtain.
