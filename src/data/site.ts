@@ -20,6 +20,8 @@ export type Service = {
   intro: string;
   deliverables: string[];
   fit: string[];
+  // Search snippet: <title> (before the "| leadglobe" template) and meta description
+  seo: { title: string; description: string };
 };
 
 export const site = {
@@ -30,6 +32,12 @@ export const site = {
   email: 'hello@leadglobe.co', // PLACEHOLDER: contact address
   description:
     'leadglobe builds and runs the systems, campaigns and workflows behind go-to-market: outbound, account-based marketing, paid media, content and RevOps.',
+  // Home page <title> (used as-is, no template) and default meta description
+  seo: {
+    title: 'leadglobe | AI-native GTM agency for outbound, ABM & RevOps',
+    description:
+      'AI-native GTM agency. We set your go-to-market strategy, then run outbound, ABM, paid media, content and RevOps as one connected system.',
+  },
   cta: {
     primary: 'discuss your gtm needs',
     secondary: 'explore services',
@@ -147,6 +155,11 @@ export const services: Service[] = [
   {
     slug: 'gtm-services',
     tab: 'gtm services',
+    seo: {
+      title: 'Outbound GTM agency: research to sales handoff',
+      description:
+        'Outbound run as one process: account targeting, buyer research, signal tracking, deliverable sending and a clean handoff to your sales team.',
+    },
     label: '01 / gtm services',
     headline: 'from target accounts to sales conversations.',
     description: 'We research prospects, run outbound campaigns, and manage follow-ups and sales handoffs.',
@@ -176,6 +189,11 @@ export const services: Service[] = [
   {
     slug: 'account-based-marketing',
     tab: 'account-based marketing',
+    seo: {
+      title: 'Account-based marketing (ABM) agency',
+      description:
+        'ABM run end to end: tiered account lists agreed with sales, buyer maps, coordinated ads, email and sales touches, and account-level reporting.',
+    },
     label: '02 / account-based marketing',
     headline: 'turn target accounts into pipeline.',
     description: 'We coordinate account research, targeted campaigns, and sales engagement.',
@@ -205,6 +223,11 @@ export const services: Service[] = [
   {
     slug: 'paid-media',
     tab: 'paid media',
+    seo: {
+      title: 'Paid media agency: LinkedIn and search ads',
+      description:
+        'LinkedIn and search campaigns with conversion tracking connected to your CRM, so spend, conversions and pipeline are reported in one place.',
+    },
     label: '03 / paid media',
     headline: 'make your ad spend accountable.',
     description: 'We run and optimize paid campaigns, connecting spend to conversions and pipeline reporting.',
@@ -234,6 +257,11 @@ export const services: Service[] = [
   {
     slug: 'content-engineering',
     tab: 'content engineering',
+    seo: {
+      title: 'Content engineering: founder and expert content',
+      description:
+        'We interview founders and experts and turn what they know into posts, articles and reusable sales assets, published on a regular schedule.',
+    },
     label: '04 / content engineering',
     headline: 'turn expertise into content that works.',
     description: 'We turn ideas and conversations into content your team can publish, distribute, and reuse.',
@@ -262,6 +290,11 @@ export const services: Service[] = [
   {
     slug: 'revops',
     tab: 'revops',
+    seo: {
+      title: 'RevOps agency: CRM, routing and attribution',
+      description:
+        'RevOps for CRMs nobody trusts: deduplicated records, lead routing, attribution, documented automations and reports your team actually uses.',
+    },
     label: '05 / revops',
     headline: 'make your revenue systems work together.',
     description: 'We connect CRM data, routing, reporting, and automation into reliable workflows.',

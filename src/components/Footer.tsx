@@ -13,7 +13,7 @@ export function Footer() {
       </div>
       <div className="footer__cols">
         <div>
-          <h2 className="footer__h">services</h2>
+          <p className="footer__h">services</p>
           <ul>
             {services.map((s) => (
               <li key={s.slug}><Link className="u-link" href={`/services/${s.slug}/`}>{s.tab}</Link></li>
@@ -21,7 +21,7 @@ export function Footer() {
           </ul>
         </div>
         <div>
-          <h2 className="footer__h">company</h2>
+          <p className="footer__h">company</p>
           <ul>
             {nav.map((n) => (
               <li key={n.href}><a className="u-link" href={n.href}>{n.label}</a></li>
@@ -29,7 +29,7 @@ export function Footer() {
           </ul>
         </div>
         <div>
-          <h2 className="footer__h">contact</h2>
+          <p className="footer__h">contact</p>
           <ul>
             <li><a className="u-link" href={mailHref}>{site.email}</a></li>
             {site.socials.map((s) => (

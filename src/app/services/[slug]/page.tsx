@@ -11,15 +11,21 @@ export function generateStaticParams() {
   return services.map((s) => ({ slug: s.slug }));
 }
 
+// Same object as in layout.tsx: openGraph/twitter set here replace the layout's wholesale.
+const ogImage = { url: '/og.png', width: 1200, height: 630, alt: 'leadglobe, AI-native GTM agency' };
+
 export async function generateMetadata({ params }: PageProps<'/services/[slug]'>): Promise<Metadata> {
   const { slug } = await params;
   const s = services.find((x) => x.slug === slug);
   if (!s) return {};
-  const title = s.tab.replace(/^gtm/, 'GTM').replace(/^revops$/, 'RevOps').replace(/^\w/, (c) => c.toUpperCase());
+  const { title, description } = s.seo;
+  const ogTitle = `${title} | ${site.name}`;
+  // alternates.canonical is inherited from the root layout ('./' resolves to this page's path).
   return {
     title,
-    description: s.intro,
-    openGraph: { type: 'website', siteName: site.name, title: `${title} | ${site.name}`, description: s.intro, images: ['/og.png'] },
+    description,
+    openGraph: { type: 'website', siteName: site.name, url: `/services/${slug}/`, title: ogTitle, description, images: [ogImage] },
+    twitter: { card: 'summary_large_image', title: ogTitle, description, images: [ogImage] },
   };
 }
 
@@ -30,8 +36,31 @@ export default async function ServicePage({ params }: PageProps<'/services/[slug
   const s = services[i];
   const next = services[(i + 1) % services.length];
 
+  const url = `${site.url}/services/${s.slug}/`;
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Service',
+        name: s.seo.title,
+        description: s.seo.description,
+        serviceType: s.tab,
+        provider: { '@id': `${site.url}/#org` },
+        url,
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: `${site.url}/` },
+          { '@type': 'ListItem', position: 2, name: s.tab, item: url },
+        ],
+      },
+    ],
+  };
+
   return (
     <article className="svc-page">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
       <header className="svc-page__hero">
         <div className="svc-page__copy">
           <nav className="crumbs" aria-label="Breadcrumb">
