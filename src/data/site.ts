@@ -135,7 +135,8 @@ export const consoleSection = {
     { agent: 'writing', service: 'content-engineering', task: 'Turn the founder interview into a LinkedIn post', result: 'Post drafted in founder voice', needsApproval: true, status: 'drafted' },
     { agent: 'routing', service: 'revops', task: 'Merge three Jordan Ortiz records into one', result: 'Matching, owner next', needsApproval: false, status: 'running' },
   ] satisfies RunRow[],
-  approval: { waiting: 'needs approval', approved: 'approved', by: 'your team', action: 'approve' },
+  panel: { title: 'run log', row: 'row', rows: 'rows' },
+  approval: { waiting: 'needs approval', approved: 'approved', by: 'your team', byPrefix: 'by', action: 'approve' },
   caption: 'illustrative run log. sample records are fictional.',
   statusLabels: {
     running: 'running',

@@ -1,9 +1,10 @@
+import { AgentConsole } from '@/components/AgentConsole';
 import { Button } from '@/components/Button';
 import { ContactForm } from '@/components/ContactForm';
 import { GTMHero } from '@/components/gtm/GTMHero';
 import { Route } from '@/components/Route';
 import { ServiceTabs } from '@/components/ServiceTabs';
-import { about, contactHref, engagement, faq, finalCta, hero, howItWorks, principles, servicesIntro, site } from '@/data/site';
+import { about, consoleSection, contactHref, engagement, faq, finalCta, hero, howItWorks, principles, servicesIntro, site } from '@/data/site';
 
 const faqLd = {
   '@context': 'https://schema.org',
@@ -35,7 +36,18 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="services" className="section section--services" aria-labelledby="services-title">
+      <section id="console" className="section section--console" aria-labelledby="console-title">
+        <div className="section__head">
+          <div className="section__lead">
+            <p className="label" data-reveal="fade">{consoleSection.label}</p>
+            <h2 id="console-title" className="h2" data-split="lines">{consoleSection.heading}</h2>
+          </div>
+          <p className="section__intro" data-reveal="up">{consoleSection.copy}</p>
+        </div>
+        <AgentConsole />
+      </section>
+
+      <section id="services"className="section section--services" aria-labelledby="services-title">
         <div className="section__head">
           <h2 id="services-title" className="h2" data-split="lines">{servicesIntro.heading}</h2>
           <p className="section__intro" data-reveal="up">{servicesIntro.copy}</p>
