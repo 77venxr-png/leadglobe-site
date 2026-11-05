@@ -102,3 +102,18 @@ I did the research directly with web fetches rather than through an agent, so th
 4. **Stage 3:** integrate. Tokens for any new values go in `:root`, and `DESIGN.md` gets a "v6: the console" entry.
 5. **Stage 4:** the QA agent runs a11y, responsive and performance checks. Fixes are applied, then checks re-run.
 6. **Stage 5:** commit on the feature branch. Push is **blocked**: there is no remote and no GitHub access in this session. Attach the repo (or add a remote) and push with `git push -u origin feature/ai-native-creative-direction`.
+
+## 7. External skill libraries (added 2026-11-05)
+
+The owner supplied 16 skill repositories. All 16 were shallow-cloned into the session scratchpad
+as **read-only reference material**: they are not vendored into this repo, and no script, `npx`
+command, hook or installer from them is run. A quick scan for embedded commands, network calls and
+agent-directed instructions found only documentation mentions of `npx impeccable` and
+`npx svgo`, and workers are told not to run them. Owner rules in DESIGN.md override every skill.
+
+| Role | Skills used |
+|---|---|
+| System polish (CSS, a11y, components) | pbakaus/impeccable · vercel-labs/agent-skills `web-design-guidelines`, `react-best-practices` · emilkowalski/skills `review-animations` · greensock/gsap-skills `gsap-react`, `gsap-scrolltrigger` · jpoindexter/typography-skills `microtypography` · akillness/jeo-skills `responsive-design` |
+| Hero polish (three.js, motion) | CloudAI-X/threejs-skills `threejs-performance` · greensock/gsap-skills `gsap-performance`, `gsap-react` · typography-skills `hierarchy-and-scale` · emilkowalski `review-animations` |
+| Creative director review | smixs/creative-director-skill · typography-skills `typography-audit` · emilkowalski `emil-design-eng` |
+| Not used (out of scope) | RobLe3/cc-blender-skill, remotion-dev/skills (video); msitarzewski/agency-agents (role prompts, no skills); coreyhaines31/marketingskills (CRO copy would add claims needing owner confirmation); wshobson/agents, plugin87, nextlevelbuilder (overlap with the above). No LangChain anywhere. |
