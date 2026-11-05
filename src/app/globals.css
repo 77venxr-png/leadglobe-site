@@ -300,7 +300,7 @@ html.header-away .header { translate: 0 -100%; }
   display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); row-gap: 2rem;
   align-items: end;
   /* breathe above the claim; the bottom stays short because the engine (the proof of it) follows */
-  padding: calc(var(--header) + var(--space-breathe)) var(--pad-x) clamp(1.5rem, 0.5rem + 2vw, 2.5rem);
+  padding: calc(var(--header) + var(--space-tight)) var(--pad-x) clamp(1.5rem, 0.5rem + 2vw, 2.5rem);
 }
 .hero__copy { grid-column: 1 / span 8; display: grid; gap: 1.25rem; }
 /* The one mono line above the h1 (director's amendment 2): the machine's tag on the claim,

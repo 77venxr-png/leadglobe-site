@@ -62,7 +62,7 @@ export const nav = [
 
 export const hero = {
   eyebrow: 'ai-native gtm agency',
-  headline: 'strategy + connected execution to fix your pipeline leakage',
+  headline: 'strategy + connected execution to fix your pipeline leakage.',
   copy:
     'We set your go-to-market strategy, then run outbound, ABM, paid media, content and RevOps as one connected system, so qualified buyers stop slipping through the gaps between teams and tools.',
   // The connected revenue engine under the hero. Scroll (desktop) or a timer (phones) moves the
@@ -162,7 +162,7 @@ export const services: Service[] = [
         'Outbound run as one process: account targeting, buyer research, signal tracking, deliverable sending and a clean handoff to your sales team.',
     },
     label: '01 / gtm services',
-    headline: 'from target accounts to sales conversations',
+    headline: 'from target accounts to sales conversations.',
     description: 'We research prospects, run outbound campaigns, and manage follow-ups and sales handoffs.',
     capabilities: [
       { name: 'Account targeting', detail: 'Build and maintain the list of companies worth pursuing, with the criteria written down so it can be reviewed and changed.' },
