@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { hero, mailHref, nav, services, site } from '@/data/site';
+import { mailHref, nav, services, site } from '@/data/site';
 
 export function Footer() {
   return (
@@ -9,7 +9,6 @@ export function Footer() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/brand/leadglobe-orbit-lower-horizontal-white.svg" alt="" width={220} height={59} loading="lazy" />
         </Link>
-        <p className="footer__line">{hero.eyebrow}.</p>
       </div>
       <div className="footer__cols">
         <div>

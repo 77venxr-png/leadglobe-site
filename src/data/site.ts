@@ -62,7 +62,7 @@ export const nav = [
 
 export const hero = {
   eyebrow: 'ai-native gtm agency',
-  headline: 'strategy + connected execution to fix your pipeline leakage.',
+  headline: 'strategy + connected execution to fix your pipeline leakage',
   copy:
     'We set your go-to-market strategy, then run outbound, ABM, paid media, content and RevOps as one connected system, so qualified buyers stop slipping through the gaps between teams and tools.',
   // The connected revenue engine under the hero. Scroll (desktop) or a timer (phones) moves the
@@ -148,7 +148,7 @@ export const consoleSection = {
 };
 
 export const servicesIntro = {
-  heading: 'services.',
+  heading: 'services',
   copy: 'Five service lines, each made of capabilities you can scope on their own. Pick a line to see the workflow we run.',
 };
 
@@ -162,7 +162,7 @@ export const services: Service[] = [
         'Outbound run as one process: account targeting, buyer research, signal tracking, deliverable sending and a clean handoff to your sales team.',
     },
     label: '01 / gtm services',
-    headline: 'from target accounts to sales conversations.',
+    headline: 'from target accounts to sales conversations',
     description: 'We research prospects, run outbound campaigns, and manage follow-ups and sales handoffs.',
     capabilities: [
       { name: 'Account targeting', detail: 'Build and maintain the list of companies worth pursuing, with the criteria written down so it can be reviewed and changed.' },
@@ -325,7 +325,7 @@ export const services: Service[] = [
 ];
 
 export const principles = {
-  heading: 'how we work.',
+  heading: 'how we work',
   items: [
     { name: 'Execution over advice', text: 'We do the work, not just recommend it.' },
     { name: 'Reliable by design', text: 'Clear ownership, validation, and documentation.' },
@@ -335,7 +335,7 @@ export const principles = {
 };
 
 export const engagement = {
-  heading: 'working together.',
+  heading: 'working together',
   intro: 'Start with one service or a single capability. Every engagement is scoped to what you need now.',
   stages: [
     { name: 'Scope', text: 'Agree on the work, deliverables, and measures of success.', output: 'A written scope with owners and success measures.' },
@@ -345,7 +345,7 @@ export const engagement = {
 };
 
 export const faq = {
-  heading: 'questions.',
+  heading: 'questions',
   items: [
     {
       q: 'Which services does leadglobe offer?',

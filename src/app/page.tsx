@@ -16,7 +16,7 @@ export default function Home() {
     <>
       <section className="hero" aria-labelledby="hero-title">
         <div className="hero__copy">
-          <p className="label" data-reveal="fade" data-intro>{hero.eyebrow}</p>
+          <p className="label hero__eyebrow" data-reveal="fade" data-intro>{hero.eyebrow}</p>
           <h1 id="hero-title" className="hero__title" data-split="lines" data-intro>{hero.headline}</h1>
         </div>
         <div className="hero__side">
@@ -38,7 +38,6 @@ export default function Home() {
       <section id="console" className="section section--console" aria-labelledby="console-title">
         <div className="section__head">
           <div className="section__lead">
-            <p className="label" data-reveal="fade">{consoleSection.label}</p>
             <h2 id="console-title" className="h2" data-split="lines">{consoleSection.heading}</h2>
           </div>
           <p className="section__intro" data-reveal="up">{consoleSection.copy}</p>
@@ -46,7 +45,7 @@ export default function Home() {
         <AgentConsole />
       </section>
 
-      <section id="services"className="section section--services" aria-labelledby="services-title">
+      <section id="services" className="section section--services" aria-labelledby="services-title">
         <div className="section__head">
           <h2 id="services-title" className="h2" data-split="lines">{servicesIntro.heading}</h2>
           <p className="section__intro" data-reveal="up">{servicesIntro.copy}</p>
@@ -61,7 +60,6 @@ export default function Home() {
 
       <section id="about" className="section section--dark" aria-labelledby="about-title">
         <div className="about">
-          <p className="label about__label">{about.label}</p>
           <h2 id="about-title" className="h2" data-split="lines">{about.heading}</h2>
           <p className="about__text" data-reveal="up">{about.text}</p>
         </div>
@@ -95,7 +93,7 @@ export default function Home() {
                   <h3 className="engage__name">{s.name}</h3>
                   <p className="engage__text">{s.text}</p>
                 </div>
-                <p className="engage__out"><span className="label">you get</span>{s.output}</p>
+                <p className="engage__out"><span className="engage__k">you get</span>{s.output}</p>
               </li>
             ))}
           </ol>

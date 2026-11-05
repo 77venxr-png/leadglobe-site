@@ -68,7 +68,6 @@ export default async function ServicePage({ params }: PageProps<'/services/[slug
             <span aria-hidden="true">/</span>
             <span aria-current="page">{s.tab}</span>
           </nav>
-          <p className="label" data-reveal="fade" data-intro>{s.label}</p>
           <h1 className="svc-page__title" data-split="lines" data-intro>{s.headline}</h1>
           <p className="svc-page__intro">{s.intro}</p>
           <div className="hero__actions" data-reveal="up" data-intro data-delay="0.3">
@@ -85,7 +84,7 @@ export default async function ServicePage({ params }: PageProps<'/services/[slug
       </section>
 
       <section className="svc-page__caps" aria-labelledby="caps-title">
-        <h2 id="caps-title" className="h2" data-split="lines">what we run.</h2>
+        <h2 id="caps-title" className="h2" data-split="lines">what we run</h2>
         <ol className="cap-list">
           {s.capabilities.map((c, k) => (
             <li key={c.name} data-reveal="up">
@@ -118,7 +117,7 @@ export default async function ServicePage({ params }: PageProps<'/services/[slug
 
       <nav className="next" aria-label="Next service">
         <Link href={`/services/${next.slug}/`} className="next__link">
-          <span className="label">next service</span>
+          <span className="next__k">next service</span>
           <span className="next__title">{next.tab}</span>
           <span className="next__arrow" aria-hidden="true">→</span>
         </Link>

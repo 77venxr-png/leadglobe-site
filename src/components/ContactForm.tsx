@@ -79,9 +79,9 @@ export function ContactForm() {
           <span className="btn__arrow" aria-hidden="true">→</span>
         </button>
         <p className="form__status" role="status">
-          {state === 'sent' && "Thanks, your message is in. We'll reply by email."}
-          {state === 'mailto' && `Your email app should open with the details filled in. If it doesn't, write to ${site.email}.`}
-          {state === 'error' && `That didn't send. Please try again, or write to ${site.email}.`}
+          {state === 'sent' && 'Thanks, your message is in. We’ll reply by email.'}
+          {state === 'mailto' && `Your email app should open with the details filled in. If it doesn’t, write to ${site.email}.`}
+          {state === 'error' && `That didn’t send. Please try again, or write to ${site.email}.`}
         </p>
       </div>
     </form>
