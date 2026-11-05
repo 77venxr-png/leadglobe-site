@@ -4,6 +4,7 @@ Agent definitions adapted from [wshobson/agents](https://github.com/wshobson/age
 
 | Agent | Role |
 |---|---|
+| studio-director | runs the studio: stages, briefs, verification, integration |
 | creative-director | concept, art direction, scored critique (no code) |
 | editorial-typographer | type scale, rhythm, microtypography |
 | motion-director | choreography and GSAP |

@@ -42,3 +42,6 @@ next-env.d.ts
 
 # local screenshots from QA runs
 /.shots/
+
+# copy of .claude/skills for tools that read .agents/skills (node studio/sync-skills.mjs)
+/.agents/
